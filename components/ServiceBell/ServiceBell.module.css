@@ -1,0 +1,57 @@
+.bellWrapper {
+    position: fixed;
+    bottom: 85px;
+    /* Above the footer */
+    right: 20px;
+    z-index: 1000;
+}
+
+.bellButton {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FFD700 0%, #FFB900 100%);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000;
+    box-shadow: 0 10px 25px rgba(255, 185, 0, 0.4),
+        inset 0 2px 5px rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    position: relative;
+    outline: none;
+}
+
+/* Matching the "service bell" aesthetic from screenshot */
+.bellButton svg {
+    filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.1));
+}
+
+.pulse {
+    position: absolute;
+    inset: -4px;
+    border: 2px solid #FFD700;
+    border-radius: 50%;
+    z-index: -1;
+    animation: pulseAnim 2s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+    opacity: 0;
+}
+
+@keyframes pulseAnim {
+    0% {
+        transform: scale(1);
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: scale(1.4);
+        opacity: 0;
+    }
+}
+
+/* Responsive adjustment for RTL or small screens if needed */
+[dir="rtl"] .bellWrapper {
+    right: auto;
+    left: 20px;
+}

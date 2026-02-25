@@ -7,6 +7,7 @@ import Header from '@/components/Header/Header';
 import Footer from '@/components/Footer/Footer';
 import TableInitializer from '@/components/TableInitializer';
 import TableErrorModal from '@/components/TableErrorModal';
+import ServiceBell from '@/components/ServiceBell/ServiceBell';
 
 export const metadata = {
   title: 'Restaurant Client',
@@ -38,6 +39,7 @@ export default async function RootLayout({ children }) {
           <UIProvider>
             <TableInitializer />
             <TableErrorModal />
+            <ServiceBell />
             <CartProvider>
               <div className="app-container">
                 {/* Core structural styles that must always load */}
