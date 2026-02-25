@@ -8,11 +8,11 @@ import { supabase } from '@/lib/supabase';
 import styles from './ServiceBell.module.css';
 
 const ServiceBell = () => {
-    const { tableData } = useUI();
+    const { tableData, guestId } = useUI();
     const [status, setStatus] = useState('idle'); // idle, sending, sent
 
     const handleCallService = async () => {
-        if (!tableData?.id || status !== 'idle') return;
+        if (!tableData?.id || !guestId || status !== 'idle') return;
 
         setStatus('sending');
         try {
@@ -21,6 +21,7 @@ const ServiceBell = () => {
                 .insert([
                     {
                         table_id: tableData.id,
+                        guest_id: guestId,
                         status: 'pending',
                         role_id: 2, // res-waiter
                         type: 'call_waiter'

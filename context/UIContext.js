@@ -9,13 +9,25 @@ export const UIProvider = ({ children }) => {
     const [tableNumber, setTableNumber] = useState(null);
     const [tableData, setTableData] = useState(null);
     const [tableError, setTableError] = useState(false);
+    const [guestId, setGuestId] = useState(null);
+
+    // Initialize/Persist Guest Session
+    React.useEffect(() => {
+        let savedId = localStorage.getItem('restaurant_guest_uid');
+        if (!savedId) {
+            savedId = crypto.randomUUID?.() || Math.random().toString(36).substring(2, 15);
+            localStorage.setItem('restaurant_guest_uid', savedId);
+        }
+        setGuestId(savedId);
+    }, []);
 
     return (
         <UIContext.Provider value={{
             headerTitle, setHeaderTitle,
             tableNumber, setTableNumber,
             tableData, setTableData,
-            tableError, setTableError
+            tableError, setTableError,
+            guestId
         }}>
             {children}
         </UIContext.Provider>
