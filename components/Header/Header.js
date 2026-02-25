@@ -69,7 +69,7 @@ const Header = ({ config }) => {
                     )}
                 </AnimatePresence>
 
-                {/* Fixed Language Toggle */}
+                {/* Fixed Actions (Language + Table) */}
                 <div className={styles.actions}>
                     <motion.button
                         whileHover={{ scale: 1.05 }}

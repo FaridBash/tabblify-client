@@ -10,7 +10,7 @@ import { ChevronRight, ChevronLeft } from 'lucide-react';
 
 const CategoryList = ({ initialCategories, menu }) => {
     const { language, t } = useLanguage();
-    const { setHeaderTitle } = useUI();
+    const { setHeaderTitle, tableData } = useUI();
 
     useEffect(() => {
         // Set global header title
@@ -19,6 +19,11 @@ const CategoryList = ({ initialCategories, menu }) => {
         // Clear title on unmount
         return () => setHeaderTitle('');
     }, [menu, t, setHeaderTitle]);
+
+    const getCategoryHref = (categoryId) => {
+        const base = `/menu/${menu.id}/${categoryId}`;
+        return tableData?.table_hash ? `${base}?t=${tableData.table_hash}` : base;
+    };
 
     const container = {
         hidden: { opacity: 0 },
@@ -46,7 +51,7 @@ const CategoryList = ({ initialCategories, menu }) => {
                 {initialCategories.map((category) => (
                     <motion.div key={category.id} variants={item}>
                         <Link
-                            href={`/menu/${menu.id}/${category.id}`}
+                            href={getCategoryHref(category.id)}
                             className={`${styles.categoryCard} glass-card glass-card-hover`}
                         >
                             {category.image_url && (

@@ -5,6 +5,8 @@ import './globals.css';
 import { supabase } from '@/lib/supabase';
 import Header from '@/components/Header/Header';
 import Footer from '@/components/Footer/Footer';
+import TableInitializer from '@/components/TableInitializer';
+import TableErrorModal from '@/components/TableErrorModal';
 
 export const metadata = {
   title: 'Restaurant Client',
@@ -34,6 +36,8 @@ export default async function RootLayout({ children }) {
       <body suppressHydrationWarning>
         <LanguageProvider>
           <UIProvider>
+            <TableInitializer />
+            <TableErrorModal />
             <CartProvider>
               <div className="app-container">
                 {/* Core structural styles that must always load */}
