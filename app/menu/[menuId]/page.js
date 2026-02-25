@@ -27,8 +27,34 @@ async function getMenu(menuId) {
     return data;
 }
 
-export default async function CategoryPage({ params }) {
+export default async function CategoryPage({ params, searchParams }) {
     const { menuId } = await params;
+    const resolvedSearchParams = await searchParams;
+    const tableHash = resolvedSearchParams?.t;
+
+    // Strict Validation: Must have a table hash
+    if (!tableHash) return <div className={styles.container}></div>;
+
+    // Validate table exists and is active
+    const { data: table, error: tableError } = await supabase
+        .from('tables')
+        .select('id')
+        .eq('table_hash', tableHash)
+        .eq('is_active', true)
+        .single();
+
+    if (tableError || !table) return <div className={styles.container}></div>;
+
+    // Validate menu is assigned to this table
+    const { data: assignment, error: assignmentError } = await supabase
+        .from('table_menu_assignments')
+        .select('*')
+        .eq('table_id', table.id)
+        .eq('menu_id', menuId)
+        .single();
+
+    if (assignmentError || !assignment) return <div className={styles.container}></div>;
+
     const categories = await getCategories(menuId);
     const menu = await getMenu(menuId);
 

@@ -3,19 +3,9 @@ import MenuList from '@/components/Home/MenuList';
 import styles from './page.module.css';
 
 async function getMenus(tableIdentifier) {
-  // If no table identifier provided, return all active menus ordered by sort_order
+  // Strict: If no table hash provided, return no menus
   if (!tableIdentifier) {
-    const { data, error } = await supabase
-      .from('menus')
-      .select('*')
-      .eq('is_active', true)
-      .order('sort_order', { ascending: true });
-
-    if (error) {
-      console.error('Error fetching all menus:', error);
-      return [];
-    }
-    return data;
+    return [];
   }
 
   // If table identifier provided, first find the table strictly by hash

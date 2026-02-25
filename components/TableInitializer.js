@@ -58,7 +58,11 @@ function TableParamsHandler() {
                 }
             } catch (e) {
                 localStorage.removeItem('restaurant_table_info');
+                setTableError(true);
             }
+        } else {
+            // No URL param and no saved session - this is an unauthorized access attempt
+            setTableError(true);
         }
     }, [searchParams, pathname, router, setTableNumber, setTableData, setTableError]);
 
