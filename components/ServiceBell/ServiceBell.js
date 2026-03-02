@@ -6,12 +6,19 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useUI } from '@/context/UIContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { supabase } from '@/lib/supabase';
+import { usePathname } from 'next/navigation';
 import styles from './ServiceBell.module.css';
 
 const ServiceBell = () => {
     const { tableData, guestId } = useUI();
     const { t } = useLanguage();
     const [status, setStatus] = useState('idle'); // idle, sending, sent, in-progress, completed
+    const pathname = usePathname();
+
+    // Hide bell if not in a table session directory
+    if (!pathname.startsWith('/t/')) {
+        return null;
+    }
 
     // Real-time listener
     useEffect(() => {

@@ -10,7 +10,8 @@ export default function TableErrorModal() {
     const { tableError } = useUI();
     const { t } = useLanguage();
 
-    if (!tableError) return null;
+    // Disable this popup entirely as requested
+    return null;
 
     return (
         <AnimatePresence>

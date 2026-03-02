@@ -39,6 +39,12 @@ function TableParamsHandler() {
         const urlTable = params?.tableId;
         const savedTableJson = localStorage.getItem('restaurant_table_info');
 
+        // IF we're on the landing page (root /), don't perform auto-redirects
+        if (pathname === '/') {
+            setTableError(false);
+            return;
+        }
+
         if (urlTable) {
             // URL has it, fetch fresh data
             fetchTableData(urlTable);
@@ -63,7 +69,7 @@ function TableParamsHandler() {
             // No URL param and no saved session - this is an unauthorized access attempt
             setTableError(true);
         }
-    }, [params, pathname, router, setTableNumber, setTableData, setTableError]);
+    }, [pathname, params, router, setTableNumber, setTableData, setTableError]);
 
     return null;
 }

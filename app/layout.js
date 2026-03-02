@@ -36,7 +36,7 @@ export default async function RootLayout({ children }) {
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning>
         <LanguageProvider>
-          <UIProvider>
+          <UIProvider initialConfig={uiConfig}>
             <TableInitializer />
             <TableErrorModal />
             <ServiceBell />
@@ -60,7 +60,7 @@ export default async function RootLayout({ children }) {
                     }
                     .app-container {
                       display: grid !important;
-                      grid-template-rows: auto 1fr 70px !important; /* Fixed footer height for reliability */
+                      grid-template-rows: auto 1fr auto !important;
                       height: 100dvh !important;
                       width: 100vw !important;
                       position: relative !important;
@@ -73,6 +73,7 @@ export default async function RootLayout({ children }) {
                       -webkit-overflow-scrolling: touch;
                       scrollbar-width: none;
                       position: relative;
+                      padding-bottom: 20px !important;
                     }
                     .main-content::-webkit-scrollbar {
                       display: none;
