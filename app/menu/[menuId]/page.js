@@ -2,6 +2,8 @@ import { supabase } from '@/lib/supabase';
 import CategoryList from '@/components/Category/CategoryList';
 import styles from './page.module.css';
 
+export const dynamic = 'force-dynamic';
+
 async function getCategories(menuId) {
     const { data, error } = await supabase
         .from('categories')

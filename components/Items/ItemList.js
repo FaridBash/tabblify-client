@@ -6,6 +6,7 @@ import { useUI } from '@/context/UIContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Eye, X } from 'lucide-react';
 import styles from './ItemList.module.css';
+import PDFMenu from '../Category/PDFMenu';
 
 const ItemList = ({ initialItems, category }) => {
     const { language, t } = useLanguage();
@@ -31,6 +32,10 @@ const ItemList = ({ initialItems, category }) => {
         hidden: { y: 20, opacity: 0 },
         show: { y: 0, opacity: 1 }
     };
+
+    if (category?.menus?.menu_type?.toLowerCase() === 'pdf') {
+        return <PDFMenu pdfUrl={category.menus.pdf_url} />;
+    }
 
     return (
         <div className={styles.wrapper}>

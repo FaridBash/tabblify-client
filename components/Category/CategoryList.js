@@ -7,6 +7,7 @@ import { useUI } from '@/context/UIContext';
 import { motion } from 'framer-motion';
 import styles from './CategoryList.module.css';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
+import PDFMenu from './PDFMenu';
 
 const CategoryList = ({ initialCategories, menu }) => {
     const { language, t } = useLanguage();
@@ -39,6 +40,11 @@ const CategoryList = ({ initialCategories, menu }) => {
         hidden: { y: 20, opacity: 0 },
         show: { y: 0, opacity: 1 }
     };
+
+    const menuType = (menu?.menu_type || '').toLowerCase().trim();
+    if (menuType === 'pdf') {
+        return <PDFMenu pdfUrl={menu?.pdf_url || menu?.pdfURL} />;
+    }
 
     return (
         <div className={styles.wrapper}>
