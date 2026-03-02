@@ -28,8 +28,7 @@ const MenuList = ({ initialMenus }) => {
     };
 
     const getMenuHref = (menuId) => {
-        const base = `/menu/${menuId}`;
-        return tableData?.table_hash ? `${base}?t=${tableData.table_hash}` : base;
+        return tableData?.table_hash ? `/t/${tableData.table_hash}/menu/${menuId}` : `/menu/${menuId}`;
     };
 
     return (

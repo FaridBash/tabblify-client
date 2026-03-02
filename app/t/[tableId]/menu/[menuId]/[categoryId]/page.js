@@ -29,10 +29,9 @@ async function getCategory(categoryId) {
     return data;
 }
 
-export default async function ItemsPage({ params, searchParams }) {
-    const { menuId, categoryId } = await params;
-    const resolvedSearchParams = await searchParams;
-    const tableHash = resolvedSearchParams?.t;
+export default async function ItemsPage({ params }) {
+    const { menuId, categoryId, tableId } = await params;
+    const tableHash = tableId;
 
     // Strict Validation: Must have a table hash
     if (!tableHash) return <div className={styles.container}></div>;

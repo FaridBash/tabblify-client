@@ -1,14 +1,14 @@
 'use client';
 
 import { useEffect, Suspense } from 'react';
-import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname, useParams } from 'next/navigation';
 import { useUI } from '@/context/UIContext';
 import { supabase } from '@/lib/supabase';
 
 function TableParamsHandler() {
-    const searchParams = useSearchParams();
     const pathname = usePathname();
     const router = useRouter();
+    const params = useParams();
     const { setTableNumber, setTableData, setTableError } = useUI();
 
     useEffect(() => {
@@ -36,7 +36,7 @@ function TableParamsHandler() {
             }
         };
 
-        const urlTable = searchParams.get('t');
+        const urlTable = params?.tableId;
         const savedTableJson = localStorage.getItem('restaurant_table_info');
 
         if (urlTable) {
@@ -51,10 +51,9 @@ function TableParamsHandler() {
 
                 // Append identifier to URL (Strictly hash)
                 const identifier = savedTable.table_hash;
-                if (identifier) {
-                    const params = new URLSearchParams(searchParams.toString());
-                    params.set('t', identifier);
-                    router.replace(`${pathname}?${params.toString()}`);
+                if (identifier && !pathname.startsWith(`/t/${identifier}`)) {
+                    // Redirect to the table directory if not already there
+                    router.replace(`/t/${identifier}${pathname === '/' ? '' : pathname}`);
                 }
             } catch (e) {
                 localStorage.removeItem('restaurant_table_info');
@@ -64,7 +63,7 @@ function TableParamsHandler() {
             // No URL param and no saved session - this is an unauthorized access attempt
             setTableError(true);
         }
-    }, [searchParams, pathname, router, setTableNumber, setTableData, setTableError]);
+    }, [params, pathname, router, setTableNumber, setTableData, setTableError]);
 
     return null;
 }

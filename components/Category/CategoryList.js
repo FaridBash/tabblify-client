@@ -22,8 +22,7 @@ const CategoryList = ({ initialCategories, menu }) => {
     }, [menu, t, setHeaderTitle]);
 
     const getCategoryHref = (categoryId) => {
-        const base = `/menu/${menu.id}/${categoryId}`;
-        return tableData?.table_hash ? `${base}?t=${tableData.table_hash}` : base;
+        return tableData?.table_hash ? `/t/${tableData.table_hash}/menu/${menu.id}/${categoryId}` : `/menu/${menu.id}/${categoryId}`;
     };
 
     const container = {

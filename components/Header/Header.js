@@ -14,7 +14,7 @@ const Header = ({ config }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const pathname = usePathname();
     const router = useRouter();
-    const isHome = pathname === '/';
+    const isHome = pathname === '/' || /^\/t\/[^\/]+$/.test(pathname);
 
     const languages = [
         { code: 'en', name: 'English', native: 'English' },

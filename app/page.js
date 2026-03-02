@@ -1,54 +1,30 @@
-import { supabase } from '@/lib/supabase';
-import MenuList from '@/components/Home/MenuList';
-import styles from './page.module.css';
+'use client';
 
-async function getMenus(tableIdentifier) {
-  // Strict: If no table hash provided, return no menus
-  if (!tableIdentifier) {
-    return [];
-  }
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
-  // If table identifier provided, first find the table strictly by hash
-  const { data: tableData, error: tableError } = await supabase
-    .from('tables')
-    .select('id')
-    .eq('table_hash', tableIdentifier)
-    .eq('is_active', true)
-    .single();
+export default function RootRedirect() {
+    const router = useRouter();
 
-  if (tableError || !tableData) {
-    console.error('Table not found or inactive:', tableError);
-    return []; // Strict filtering: if table provided but not found, show nothing
-  }
+    useEffect(() => {
+        const savedTableJson = localStorage.getItem('restaurant_table_info');
+        if (savedTableJson) {
+            try {
+                const savedTable = JSON.parse(savedTableJson);
+                if (savedTable?.table_hash) {
+                    router.replace(`/t/${savedTable.table_hash}`);
+                    return;
+                }
+            } catch (e) {
+                console.error('Error parsing saved table');
+            }
+        }
+    }, [router]);
 
-  // Then fetch menus assigned to this table
-  const { data: assignments, error: assignmentsError } = await supabase
-    .from('table_menu_assignments')
-    .select(`
-      menus (*)
-    `)
-    .eq('table_id', tableData.id);
-
-  if (assignmentsError) {
-    console.error('Error fetching assigned menus:', assignmentsError);
-    return [];
-  }
-
-  // Extract menus from join result and filter active ones
-  return assignments
-    .map(a => a.menus)
-    .filter(m => m && m.is_active)
-    .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
-}
-
-export default async function Home({ searchParams }) {
-  const resolvedParams = await searchParams;
-  const tableParam = resolvedParams?.t;
-  const menus = await getMenus(tableParam);
-
-  return (
-    <div className={styles.container}>
-      <MenuList initialMenus={menus} />
-    </div>
-  );
+    return (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: 'var(--primary)', flexDirection: 'column', gap: '20px' }}>
+            <h2>Welcome to Café De La Paix</h2>
+            <p>Please scan the QR code on your table to view the menu.</p>
+        </div>
+    );
 }
