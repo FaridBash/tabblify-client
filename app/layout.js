@@ -8,6 +8,7 @@ import Footer from '@/components/Footer/Footer';
 import TableInitializer from '@/components/TableInitializer';
 import TableErrorModal from '@/components/TableErrorModal';
 import ServiceBell from '@/components/ServiceBell/ServiceBell';
+import ThemeInjector from '@/components/ThemeInjector';
 
 export const metadata = {
   title: 'Restaurant Client',
@@ -18,7 +19,10 @@ async function getUIConfig() {
   try {
     const { data, error } = await supabase
       .from('ui_config')
-      .select('*')
+      .select(`
+        *,
+        themes (*)
+      `)
       .single();
 
     if (error) throw error;
@@ -31,10 +35,12 @@ async function getUIConfig() {
 
 export default async function RootLayout({ children }) {
   const uiConfig = await getUIConfig();
+  const theme = uiConfig?.themes;
 
   return (
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning>
+        <ThemeInjector initialTheme={theme} />
         <LanguageProvider>
           <UIProvider initialConfig={uiConfig}>
             <TableInitializer />
@@ -42,6 +48,29 @@ export default async function RootLayout({ children }) {
             <ServiceBell />
             <CartProvider>
               <div className="app-container">
+                {/* SSR Theme Overrides */}
+                {theme && (
+                  <style dangerouslySetInnerHTML={{
+                    __html: `
+                    :root {
+                      ${theme.primary_color ? `--primary: ${theme.primary_color};` : ''}
+                      ${theme.primary_rgb ? `--primary-rgb: ${theme.primary_rgb};` : ''}
+                      ${theme.primary_glow ? `--primary-glow: ${theme.primary_glow};` : ''}
+                      ${theme.primary_dim ? `--primary-dim: ${theme.primary_dim};` : ''}
+                      ${theme.secondary_color ? `--secondary: ${theme.secondary_color};` : ''}
+                      ${theme.secondary_color ? `--secondary-light: ${theme.secondary_color};` : ''}
+                      ${theme.secondary_rgb ? `--secondary-rgb: ${theme.secondary_rgb};` : ''}
+                      ${theme.secondary_dark ? `--secondary-dark: ${theme.secondary_dark};` : ''}
+                      ${theme.background_color ? `--background: ${theme.background_color};` : ''}
+                      ${theme.foreground_color ? `--foreground: ${theme.foreground_color};` : ''}
+                      ${theme.success_color ? `--success: ${theme.success_color};` : ''}
+                      ${theme.warning_color ? `--warning: ${theme.warning_color};` : ''}
+                      ${theme.error_color ? `--error: ${theme.error_color};` : ''}
+                      ${theme.primary_rgb ? `--glass-bg: rgba(${theme.primary_rgb}, 0.05);` : ''}
+                      ${theme.primary_rgb ? `--glass-border: rgba(${theme.primary_rgb}, 0.15);` : ''}
+                    }
+                  `}} />
+                )}
                 {/* Core structural styles that must always load */}
                 <style dangerouslySetInnerHTML={{
                   __html: `

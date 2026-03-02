@@ -1,29 +1,40 @@
 @import url('https://fonts.googleapis.com/css2?family=David+Libre:wght@400;500;700&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Cairo:wght@200;300;400;500;600;700;800;900&display=swap');
 
 :root {
+  /* Hex Brand Colors */
   --primary: #cba86b;
-  /* Soft gold/beige from typography and leaf details */
   --primary-glow: #e6c589;
-  /* Brighter gold for hover states */
   --primary-dim: #967d51;
-  /* Darker beige for subdued elements */
-
   --secondary: #122F2A;
-  /* The deep, rich emerald green background */
   --secondary-light: #183e38;
-  /* Slightly lighter green for cards/elevated elements */
   --secondary-dark: #0a1c19;
-  /* Darker green for shadows/depth */
-
   --background: #122F2A;
-  /* Deep green base */
   --foreground: #f2ebd9;
-  /* Off-white/beige for reading text smoothly */
 
-  --glass-bg: rgba(203, 168, 107, 0.05);
-  /* Tinted glass with gold accent */
-  --glass-border: rgba(203, 168, 107, 0.15);
-  /* Slightly stronger gold border */
+  /* RGB Brand Colors (for opacity manipulation) */
+  --primary-rgb: 203, 168, 107;
+  --primary-glow-rgb: 230, 197, 137;
+  --secondary-rgb: 18, 47, 42;
+  --secondary-dark-rgb: 10, 28, 25;
+  --foreground-rgb: 242, 235, 217;
+
+  /* Utilities */
+  --white: #ffffff;
+  --white-rgb: 255, 255, 255;
+  --black: #000000;
+  --black-rgb: 0, 0, 0;
+
+  /* Status Colors */
+  --success: #22c55e;
+  --success-glow: #16a34a;
+  --success-rgb: 34, 197, 94;
+  --warning: #f59e0b;
+  --warning-glow: #d97706;
+  --warning-rgb: 245, 158, 11;
+  --error: #ef4444;
+
+  --glass-bg: rgba(var(--primary-rgb), 0.05);
+  --glass-border: rgba(var(--primary-rgb), 0.15);
   --glass-blur: 15px;
   --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --font-en: 'Lato', sans-serif;

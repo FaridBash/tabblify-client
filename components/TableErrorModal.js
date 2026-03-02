@@ -3,15 +3,16 @@
 import React from 'react';
 import { useUI } from '@/context/UIContext';
 import { useLanguage } from '@/context/LanguageContext';
-import { QrCode, XCircle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { QrCode, XCircle, Calendar } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function TableErrorModal() {
     const { tableError } = useUI();
     const { t } = useLanguage();
+    const router = useRouter();
 
-    // Disable this popup entirely as requested
-    return null;
+    if (!tableError) return null;
 
     return (
         <AnimatePresence>
@@ -19,7 +20,7 @@ export default function TableErrorModal() {
                 style={{
                     position: 'fixed',
                     inset: 0,
-                    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+                    backgroundColor: 'rgba(var(--black-rgb), 0.85)',
                     backdropFilter: 'blur(10px)',
                     zIndex: 9999,
                     display: 'flex',
@@ -32,55 +33,87 @@ export default function TableErrorModal() {
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     style={{
-                        backgroundColor: 'white',
-                        borderRadius: '24px',
+                        backgroundColor: 'var(--secondary-dark)',
+                        borderRadius: '30px',
                         padding: '40px 30px',
                         width: '100%',
-                        maxWidth: '380px',
+                        maxWidth: '400px',
                         textAlign: 'center',
-                        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+                        border: '1px solid var(--primary-dim)',
+                        boxShadow: '0 25px 50px -12px rgba(var(--black-rgb), 0.5)'
                     }}
                 >
-                    <div style={{ color: '#ef4444', marginBottom: '20px' }}>
+                    <div style={{ color: 'var(--error)', marginBottom: '20px' }}>
                         <XCircle size={64} style={{ margin: '0 auto' }} />
                     </div>
 
                     <h2 style={{
-                        color: '#1a1a1a',
-                        fontSize: '1.5rem',
-                        fontWeight: 800,
-                        marginBottom: '12px'
+                        color: 'var(--primary-glow)',
+                        fontSize: '1.8rem',
+                        fontWeight: 900,
+                        marginBottom: '15px',
+                        fontFamily: 'var(--font-h1)'
                     }}>
-                        {t('Table Not Found', 'الطاولة غير موجودة')}
+                        {t('Invalid Table', 'طاولة غير صالحة')}
                     </h2>
 
                     <p style={{
-                        color: '#666',
-                        fontSize: '0.95rem',
+                        color: 'var(--foreground)',
+                        fontSize: '1rem',
                         lineHeight: 1.6,
-                        marginBottom: '30px'
+                        marginBottom: '30px',
+                        opacity: 0.9
                     }}>
                         {t(
-                            'The table number or code you are using is invalid. Please rescan the QR code on your table to continue.',
-                            'رقم أو رمز الطاولة الذي تستخدمه غير صالح. يرجى إعادة مسح رمز الـ QR الموجود على طاولتك للمتابعة.'
+                            'We couldn\'t find the table you\'re looking for. Please scan a valid QR code or return home.',
+                            'لم نتمكن من العثور على الطاولة التي تبحث عنها. يرجى مسح رمز QR صالح أو العودة للرئيسية.'
                         )}
                     </p>
 
-                    <div style={{
-                        backgroundColor: '#f8fafc',
-                        border: '1px dashed #cbd5e1',
-                        borderRadius: '16px',
-                        padding: '20px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: '12px',
-                        color: '#64748b'
-                    }}>
-                        <QrCode size={32} />
-                        <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>
-                            {t('Please rescan QR code', 'يرجى إعادة مسح الرمز')}
-                        </span>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                        <div style={{
+                            backgroundColor: 'rgba(var(--white-rgb), 0.05)',
+                            border: '1px dashed var(--primary-dim)',
+                            borderRadius: '20px',
+                            padding: '20px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            gap: '10px',
+                            color: 'var(--primary-glow)'
+                        }}>
+                            <QrCode size={30} />
+                            <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>
+                                {t('Please rescan QR code', 'يرجى إعادة مسح الرمز')}
+                            </span>
+                        </div>
+
+                        <button
+                            onClick={() => {
+                                window.location.href = '/';
+                            }}
+                            style={{
+                                background: 'var(--primary)',
+                                color: 'var(--secondary-dark)',
+                                border: 'none',
+                                padding: '16px',
+                                borderRadius: '20px',
+                                fontSize: '1.1rem',
+                                fontWeight: 800,
+                                cursor: 'pointer',
+                                transition: 'all 0.3s ease',
+                                width: '100%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '10px',
+                                textTransform: 'uppercase',
+                                letterSpacing: '1px'
+                            }}
+                        >
+                            <Calendar size={20} />
+                            {t('Go to Home Screen', 'العودة إلى الصفحة الرئيسية')}
+                        </button>
                     </div>
                 </motion.div>
             </div>

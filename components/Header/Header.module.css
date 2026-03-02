@@ -20,9 +20,9 @@
 
 .subHeader {
     padding: 15px 20px;
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(var(--black-rgb), 0.4);
     backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(var(--white-rgb), 0.1);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -45,7 +45,7 @@
     align-items: center;
     justify-content: center;
     padding: 10px;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(var(--white-rgb), 0.1);
     border-radius: 50%;
     transition: all 0.3s ease;
 }
@@ -56,7 +56,7 @@
 }
 
 .backButton:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(var(--white-rgb), 0.2);
 }
 
 .pageTitle {
@@ -83,7 +83,7 @@
     font-weight: 900;
     color: var(--primary-glow);
     margin: 0;
-    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+    text-shadow: 0 4px 20px rgba(var(--black-rgb), 0.6);
     line-height: 1;
 }
 
@@ -93,7 +93,7 @@
     margin-top: 5px;
     font-weight: 400;
     color: var(--foreground);
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    text-shadow: 0 2px 10px rgba(var(--black-rgb), 0.5);
 }
 
 .logoContainer {
@@ -130,10 +130,10 @@
     padding: 8px 14px;
     background: var(--primary);
     border-radius: 40px;
-    color: #000;
+    color: var(--black);
     font-size: 0.85rem;
     font-weight: 800;
-    box-shadow: 0 4px 15px rgba(201, 160, 80, 0.4);
+    box-shadow: 0 4px 15px rgba(var(--primary-rgb), 0.4);
 }
 
 .tableLabel {
@@ -156,14 +156,14 @@
     align-items: center;
     gap: 8px;
     padding: 8px 14px;
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(var(--black-rgb), 0.4);
     backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(var(--white-rgb), 0.2);
     border-radius: 40px;
     font-size: 0.85rem;
     font-weight: 700;
     color: white;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 15px rgba(var(--black-rgb), 0.3);
 }
 
 /* Modal Styles preserved */
@@ -173,7 +173,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(18, 47, 42, 0.85);
+    background: rgba(var(--secondary-rgb), 0.85);
     /* rgba version of --secondary for the overlay */
     backdrop-filter: blur(8px);
     display: flex;
@@ -211,7 +211,7 @@
 
 .closeButton {
     padding: 8px;
-    background: rgba(203, 168, 107, 0.1);
+    background: rgba(var(--primary-rgb), 0.1);
     /* Primary colored glass */
     border-radius: 50%;
     color: var(--foreground);
@@ -222,7 +222,7 @@
 }
 
 .closeButton:hover {
-    background: rgba(203, 168, 107, 0.25);
+    background: rgba(var(--primary-rgb), 0.25);
     color: var(--primary-glow);
     transform: rotate(90deg);
 }
