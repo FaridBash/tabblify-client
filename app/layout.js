@@ -9,6 +9,7 @@ import TableInitializer from '@/components/TableInitializer';
 import TableErrorModal from '@/components/TableErrorModal';
 import ServiceBell from '@/components/ServiceBell/ServiceBell';
 import ThemeInjector from '@/components/ThemeInjector';
+import PopupManager from '@/components/PopupModal';
 
 export const metadata = {
   title: 'Restaurant Client',
@@ -40,9 +41,10 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning>
-        <ThemeInjector initialTheme={theme} />
         <LanguageProvider>
           <UIProvider initialConfig={uiConfig}>
+            <ThemeInjector initialTheme={theme} />
+            <PopupManager />
             <TableInitializer />
             <TableErrorModal />
             <ServiceBell />

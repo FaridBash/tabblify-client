@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 import { useUI } from '@/context/UIContext';
@@ -9,7 +8,6 @@ import { motion } from 'framer-motion';
 import styles from './page.module.css';
 
 export default function RootRedirect() {
-    const router = useRouter();
     const { t } = useLanguage();
     const { uiConfig } = useUI();
 
