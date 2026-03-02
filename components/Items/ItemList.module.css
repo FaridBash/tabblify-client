@@ -18,16 +18,16 @@
     flex-direction: column;
     border-radius: 30px;
     transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-    background: rgba(0, 0, 0, 0.65) !important;
+    background: var(--secondary-dark) !important;
     /* Darker background */
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--glass-border);
     position: relative;
 }
 
 .itemCard:hover {
     transform: translateY(-10px);
     border-color: var(--primary);
-    background: rgba(0, 0, 0, 0.85) !important;
+    background: var(--secondary) !important;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 }
 
@@ -37,6 +37,8 @@
     aspect-ratio: 1/1;
     /* Square images for a clean grid */
     overflow: hidden;
+    border-bottom: 1px solid var(--primary-dim);
+    /* Separation between image and deep green text box */
 }
 
 .itemImage {
@@ -54,14 +56,15 @@
     position: absolute;
     top: 15px;
     right: 15px;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(18, 47, 42, 0.85);
+    /* rgba from secondary base */
     backdrop-filter: blur(10px);
-    color: var(--primary);
+    color: var(--primary-glow);
     padding: 8px 15px;
     border-radius: 15px;
     font-weight: 800;
     font-size: 1.1rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--primary-dim);
 }
 
 [dir="rtl"] .priceTag {
@@ -80,14 +83,14 @@
 .itemName {
     font-size: 1.4rem;
     font-weight: 800;
-    color: white;
+    color: var(--primary-glow);
     margin: 0;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 .itemDesc {
     font-size: 0.95rem;
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--foreground);
     line-height: 1.5;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -100,7 +103,8 @@
 .viewButton {
     margin-top: auto;
     background: var(--primary);
-    color: #000;
+    color: var(--secondary-dark);
+    /* Contrast color */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -117,7 +121,8 @@
 
 .itemCard:hover .viewButton {
     transform: scale(1.02);
-    box-shadow: 0 10px 20px rgba(201, 160, 80, 0.3);
+    box-shadow: 0 10px 20px rgba(203, 168, 107, 0.3);
+    /* Primary shadow */
 }
 
 /* Modal Styling */
@@ -127,7 +132,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.9);
+    background: rgba(18, 47, 42, 0.85);
     backdrop-filter: blur(15px);
     z-index: 2000;
     display: flex;
@@ -143,8 +148,8 @@
     overflow-y: auto;
     position: relative;
     border-radius: 40px;
-    background: rgba(20, 20, 20, 0.9) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--secondary-dark) !important;
+    border: 1px solid var(--primary-dim);
     scrollbar-width: none;
 }
 
@@ -157,7 +162,8 @@
     top: 20px;
     right: 20px;
     z-index: 100;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(18, 47, 42, 0.7);
+    /* Deep green dark */
     backdrop-filter: blur(10px);
     width: 45px;
     height: 45px;
@@ -165,7 +171,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    color: var(--primary-glow);
+    border: 1px solid var(--primary-dim);
 }
 
 [dir="rtl"] .closeButton {
@@ -176,6 +183,7 @@
 .modalImageContainer {
     width: 100%;
     aspect-ratio: 1/1;
+    border-bottom: 2px solid var(--primary-dim);
 }
 
 .modalImage {
@@ -192,11 +200,12 @@
     font-size: 2rem;
     font-weight: 900;
     margin-bottom: 10px;
+    color: var(--primary-glow);
 }
 
 .modalDescription {
     font-size: 1.1rem;
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--foreground);
     line-height: 1.6;
     margin-bottom: 25px;
 }
@@ -216,11 +225,12 @@
 }
 
 .ingredientsList li {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--secondary-light);
     padding: 8px 16px;
     border-radius: 15px;
     font-size: 0.9rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--primary-dim);
+    color: var(--primary-glow);
 }
 
 @media (max-width: 600px) {

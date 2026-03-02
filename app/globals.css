@@ -1,18 +1,35 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Cairo:wght@200;300;400;500;600;700;800;900&display=swap');
 
 :root {
-  --primary: #c9a050;
-  --primary-glow: #e6c17a;
-  --secondary: #222222;
-  --background: #000000;
-  --foreground: #ffffff;
-  --glass-bg: rgba(255, 255, 255, 0.05);
-  --glass-border: rgba(255, 255, 255, 0.1);
+  --primary: #cba86b;
+  /* Soft gold/beige from typography and leaf details */
+  --primary-glow: #e6c589;
+  /* Brighter gold for hover states */
+  --primary-dim: #967d51;
+  /* Darker beige for subdued elements */
+
+  --secondary: #122F2A;
+  /* The deep, rich emerald green background */
+  --secondary-light: #183e38;
+  /* Slightly lighter green for cards/elevated elements */
+  --secondary-dark: #0a1c19;
+  /* Darker green for shadows/depth */
+
+  --background: #122F2A;
+  /* Deep green base */
+  --foreground: #f2ebd9;
+  /* Off-white/beige for reading text smoothly */
+
+  --glass-bg: rgba(203, 168, 107, 0.05);
+  /* Tinted glass with gold accent */
+  --glass-border: rgba(203, 168, 107, 0.15);
+  /* Slightly stronger gold border */
   --glass-blur: 15px;
   --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --font-en: 'Poppins', sans-serif;
   --font-ar: 'Cairo', sans-serif;
 }
+
 
 [dir="rtl"] {
   font-family: var(--font-ar);

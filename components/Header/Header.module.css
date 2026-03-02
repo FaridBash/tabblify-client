@@ -169,7 +169,8 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(18, 47, 42, 0.85);
+    /* rgba version of --secondary for the overlay */
     backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
@@ -183,6 +184,10 @@
     max-width: 320px;
     padding: 25px;
     border-radius: 30px;
+    background: var(--secondary-dark);
+    /* Dark green modal base */
+    border: 1px solid var(--primary-dim);
+    /* Subtle gold border */
 }
 
 .modalHeader {
@@ -196,14 +201,15 @@
     margin: 0;
     font-size: 1.4rem;
     font-weight: 800;
-    color: white;
+    color: var(--primary-glow);
 }
 
 .closeButton {
     padding: 8px;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(203, 168, 107, 0.1);
+    /* Primary colored glass */
     border-radius: 50%;
-    color: white;
+    color: var(--foreground);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -211,7 +217,8 @@
 }
 
 .closeButton:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(203, 168, 107, 0.25);
+    color: var(--primary-glow);
     transform: rotate(90deg);
 }
 
@@ -226,16 +233,19 @@
     justify-content: space-between;
     align-items: center;
     padding: 16px 20px;
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--secondary-light);
+    /* Lighter green for unselected */
     border-radius: 18px;
     width: 100%;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--primary-dim);
+    /* Gold tint */
     transition: all 0.2s ease;
 }
 
 .activeLang {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.3);
+    background: var(--primary);
+    /* Gold background for selected */
+    border-color: var(--primary-glow);
 }
 
 .langInfo {
@@ -252,17 +262,33 @@
 .langNative {
     font-size: 1rem;
     font-weight: 700;
-    color: white;
+    color: var(--primary-glow);
+}
+
+.activeLang .langNative {
+    color: var(--secondary-dark);
+    /* Dark text on gold */
 }
 
 .langEnglish {
     font-size: 0.8rem;
-    opacity: 0.6;
-    color: white;
+    opacity: 0.8;
+    color: var(--foreground);
 }
 
+.activeLang .langEnglish {
+    color: var(--secondary-dark);
+    /* Dark text on gold */
+    opacity: 0.9;
+}
+
+
 .checkIcon {
-    color: white;
+    color: var(--primary-glow);
+}
+
+.activeLang .checkIcon {
+    color: var(--secondary-dark);
 }
 
 @media (max-width: 480px) {

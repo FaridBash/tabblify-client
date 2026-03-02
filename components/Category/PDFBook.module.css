@@ -24,7 +24,7 @@
 }
 
 .page {
-    background-color: #1a1a1a;
+    background-color: var(--secondary);
     overflow: hidden;
     position: relative;
     box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.5);

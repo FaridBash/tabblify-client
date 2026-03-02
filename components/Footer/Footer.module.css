@@ -10,10 +10,11 @@
     align-items: center;
     z-index: 1000;
     position: relative;
-    background: rgba(0, 0, 0, 0.7);
-    /* More opaque for visibility */
+    background: var(--secondary-dark);
+    /* Dark green footer */
     backdrop-filter: blur(25px);
-    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    border-top: 1px solid var(--primary-dim);
+    /* Gold top border */
     border-radius: 25px 25px 0 0;
     /* Rounded top edges as per request */
     box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.3);
@@ -29,20 +30,28 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--secondary-light);
+    /* Lighter green pill */
     padding: 6px 14px;
     border-radius: 100px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    color: white;
+    border: 1px solid var(--primary-dim);
+    /* Gold touch */
+    color: var(--primary-glow);
     font-size: 0.85rem;
     font-weight: 700;
     backdrop-filter: blur(5px);
     pointer-events: none;
 }
 
+[dir="rtl"] .tablePill {
+    left: auto;
+    right: 20px;
+}
+
 .pinIcon {
     opacity: 0.8;
-    color: #4f46e5;
+    color: var(--primary);
+    /* Brand gold */
 }
 
 .bottomLine {
@@ -50,7 +59,7 @@
     opacity: 0.95;
     margin: 0;
     font-weight: 500;
-    color: white;
+    color: var(--primary-glow);
     text-align: center;
     letter-spacing: 0.5px;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);

@@ -113,7 +113,7 @@ const PDFBook = ({ pdfUrl }) => {
                                             renderAnnotationLayer={false}
                                             renderTextLayer={false}
                                             className={styles.pdfPage}
-                                            loading={<div style={{ backgroundColor: '#1a1a1a', width: dimensions.width, height: dimensions.height }} />}
+                                            loading={<div style={{ backgroundColor: 'var(--secondary)', width: dimensions.width, height: dimensions.height }} />}
                                         />
                                     </PageContainer>
                                 ))}
