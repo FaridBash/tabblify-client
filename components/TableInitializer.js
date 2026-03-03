@@ -39,8 +39,8 @@ function TableParamsHandler() {
         const urlTable = params?.tableId;
         const savedTableJson = localStorage.getItem('restaurant_table_info');
 
-        // IF we're on the landing page (root /), don't perform auto-redirects
-        if (pathname === '/') {
+        // Skip table logic on landing page and standalone pages like /reserve
+        if (pathname === '/' || pathname === '/reserve') {
             setTableError(false);
             return;
         }

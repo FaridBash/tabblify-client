@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import styles from './page.module.css';
 
 export default function RootRedirect() {
+    const router = useRouter();
     const { t } = useLanguage();
     const { uiConfig } = useUI();
 
@@ -51,6 +52,7 @@ export default function RootRedirect() {
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.1 }}
                 className={styles.reserveButton}
+                onClick={() => window.location.href = '/reserve'}
             >
                 <Calendar className={styles.reserveIcon} size={28} />
                 <span className={styles.reserveTitle}>

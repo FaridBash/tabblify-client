@@ -12,6 +12,8 @@ const Footer = ({ config }) => {
     const pathname = usePathname();
     const isMainScreen = pathname === '/';
 
+    if (pathname === '/reserve') return null;
+
     const bottomText = config ? (
         isMainScreen && (config.main_bottom_line_en || config.main_bottom_line_ar)
             ? t(config.main_bottom_line_en, config.main_bottom_line_ar)

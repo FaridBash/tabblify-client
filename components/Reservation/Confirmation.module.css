@@ -1,0 +1,106 @@
+.wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: auto;
+    margin-bottom: 80px;
+}
+
+.card {
+    background: rgba(var(--black-rgb, 0, 0, 0), 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--primary-dim);
+    border-radius: 30px;
+    padding: 40px 30px;
+    text-align: center;
+    max-width: 420px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.iconWrapper {
+    margin-bottom: 5px;
+}
+
+.checkIcon {
+    color: var(--success);
+    filter: drop-shadow(0 0 20px rgba(var(--success-rgb), 0.5));
+}
+
+.title {
+    font-family: var(--font-h1);
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--primary-glow);
+    line-height: 1.2;
+}
+
+.pendingNote {
+    font-size: 0.9rem;
+    color: var(--warning);
+    background: rgba(var(--warning-rgb), 0.1);
+    padding: 10px 15px;
+    border-radius: 12px;
+    font-weight: 500;
+}
+
+.details {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    background: rgba(var(--white-rgb), 0.05);
+    border-radius: 20px;
+    padding: 20px;
+}
+
+.detailRow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--foreground);
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.detailRow svg {
+    color: var(--primary);
+    flex-shrink: 0;
+}
+
+.statusBadge {
+    padding: 10px 25px;
+    border-radius: 50px;
+    font-weight: 800;
+    font-size: 0.95rem;
+    color: var(--success);
+    background: rgba(var(--success-rgb), 0.1);
+    border: 1px solid var(--success);
+}
+
+.homeBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: rgba(var(--white-rgb), 0.1);
+    border: 1px solid rgba(var(--white-rgb), 0.2);
+    color: var(--foreground);
+    padding: 14px 30px;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.homeBtn:hover {
+    background: var(--primary);
+    color: var(--secondary-dark);
+    border-color: var(--primary);
+}
