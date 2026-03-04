@@ -26,9 +26,11 @@ export default function ReservationForm({ table, date, time, settings, onComplet
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState('');
 
-    // Generate end time options (from start_time + buffer to close)
+    // Generate end time options (from start_time + 30m up to max duration or close)
     const endTimeOptions = [];
-    for (let t = h * 60 + m + 30; t <= 24 * 60; t += 30) {
+    const limitMin = table.maxDuration ? (h * 60 + m + table.maxDuration * 60) : (h * 60 + m + 240); // Default 4h if no info
+
+    for (let t = h * 60 + m + 30; t <= limitMin; t += 30) {
         const hh = Math.floor(t / 60);
         const mm = t % 60;
         if (hh >= 24) break;
@@ -164,6 +166,11 @@ export default function ReservationForm({ table, date, time, settings, onComplet
                                 <option key={t} value={t}>{t}</option>
                             ))}
                         </select>
+                        {table.maxDuration && (
+                            <p className={styles.limitInfo}>
+                                {t('Limited to', 'محدد بـ')} {table.maxDuration} {t('h due to next reservation', 'ساعة بسبب الحجز التالي')}
+                            </p>
+                        )}
                     </div>
                 </div>
 

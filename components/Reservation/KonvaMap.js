@@ -29,6 +29,7 @@ function getChairPositions(capacity, tW, tH, isRound) {
                 x: distance * Math.cos(angle),
                 y: distance * Math.sin(angle),
                 rotation: (angle * 180) / Math.PI + 90,
+                angle: angle,
             });
         }
     } else {
@@ -86,7 +87,7 @@ export default function KonvaMap({
                 if (type === ITEM_TYPES.TABLE) {
                     const available = isTableAvailable(tableId);
                     if (available || selectedTable?.id === tableId) {
-                        onTableSelect({ id: tableId, label, capacity, shape });
+                        onTableSelect({ id: tableId, label, capacity, shape, area: item.area });
                     }
                 }
             },
@@ -94,7 +95,7 @@ export default function KonvaMap({
                 if (type === ITEM_TYPES.TABLE) {
                     const available = isTableAvailable(tableId);
                     if (available || selectedTable?.id === tableId) {
-                        onTableSelect({ id: tableId, label, capacity, shape });
+                        onTableSelect({ id: tableId, label, capacity, shape, area: item.area });
                     }
                 }
             }
@@ -107,6 +108,14 @@ export default function KonvaMap({
                 let patternLines = null;
                 const isDining = label === 'Dining Area' || label === 'Wooden Floor';
                 const isTile = label === 'Entry' || label === 'Kitchen' || label === 'Parquet Floor';
+
+                const isKitchen = label?.toLowerCase() === 'kitchen';
+                const isTargetArea = !isKitchen && (
+                    label === 'Main Area' ||
+                    label === 'VIP Area' ||
+                    label === 'Patio' ||
+                    label?.toLowerCase().includes('smoking')
+                );
 
                 let strokeColor = tileStroke;
                 if (!strokeColor) {
@@ -132,50 +141,71 @@ export default function KonvaMap({
                                 lines.push(<Path key={`h2-${i}-${j}`} data={`M${i},${j + plankSize * 2} L${i + tileSize},${j + plankSize * 2}`} stroke={strokeColor} strokeWidth={1} />);
                             }
                             // Tile border
-                            lines.push(<Rect key={`b-${i}-${j}`} x={i} y={j} width={tileSize} height={tileSize} stroke={strokeColor} strokeWidth={0.5} opacity={0.5} />);
+                            lines.push(<Rect key={`b-${i}-${j}`} x={i} y={j} width={tileSize} height={tileSize} stroke={strokeColor} strokeWidth={0.5} opacity={isKitchen ? 1 : 0.5} />);
                         }
                     }
-                    patternLines = <Group>{lines}</Group>;
+                    patternLines = <Group opacity={isTargetArea ? 0.3 : 1}>{lines}</Group>;
                 }
 
                 let roomIcon = null;
                 const baseIconColor = item.textColor || "#64748b";
-                if (label === 'Kitchen' || label === 'Entry') {
+                const iconLabel = label?.toLowerCase() || '';
+
+                if (isKitchen || iconLabel.includes('entry')) {
                     const iconPath = "M17,11c0.552,0,1-0.448,1-1c0-2.206-1.794-4-4-4c-1.371,0-2.581,0.697-3.297,1.751C10.155,7.28,9.155,7,8,7 C5.794,7,4,8.794,4,11c0,0.552,0.448,1,1,1v5c0,0.552,0.448,1,1,1h10c0.552,0,1-0.448,1-1v-5H17z M14,16H8v-2h6V16z";
                     roomIcon = (
-                        <Group x={tw / 2} y={th / 2} scaleX={2.2} scaleY={2.2} offsetX={11} offsetY={11}>
-                            <Path data={iconPath} fill="black" opacity={0.1} offsetY={1} />
+                        <Group x={tw / 2} y={th / 2} scaleX={2.2} scaleY={2.2} offsetX={11} offsetY={11} opacity={1}>
+                            <Path data={iconPath} fill="black" opacity={0.15} offsetY={1} />
                             <Path data={iconPath} fill={baseIconColor} />
                         </Group>
                     );
-                } else if (label === 'Main Area' || label === 'Dining Area') {
-                    const iconPath = "M3 3h7v7H3V3zm11 0h7v7h-7V3zm-11 11h7v7H3v-7zm11 0h7v7h-7v-7z"; // 2x2 Grid
+                } else if (iconLabel.includes('smoking') && !iconLabel.includes('non')) {
+                    const iconPath = "M18,16H2V13H18V16M19,16H22V13H19V16M11,11C11,11 13,10 13,8C13,6 11,5 11,5M7,11C7,11 9,10 9,8C9,6 7,5 7,5";
                     roomIcon = (
-                        <Group x={tw / 2} y={th / 2} scaleX={2.5} scaleY={2.5} offsetX={12} offsetY={12} opacity={0.25}>
+                        <Group x={tw / 2} y={th / 2} scaleX={2} scaleY={2} offsetX={12} offsetY={10} opacity={1}>
+                            <Path data={iconPath} fill="black" opacity={0.15} offsetY={1} />
+                            <Path data={iconPath} fill={baseIconColor} />
+                        </Group>
+                    );
+                } else if (iconLabel.includes('non smoking') || iconLabel.includes('non-smoking')) {
+                    const cigPath = "M18,16H2V13H18V16M19,16H22V13H19V16M11,11C11,11 13,10 13,8C13,6 11,5 11,5M7,11C7,11 9,10 9,8C9,6 7,5 7,5";
+                    const slashPath = "M2,2L22,22";
+                    roomIcon = (
+                        <Group x={tw / 2} y={th / 2} scaleX={2} scaleY={2} offsetX={12} offsetY={10} opacity={1}>
+                            <Path data={cigPath} fill="black" opacity={0.15} offsetY={1} />
+                            <Path data={cigPath} fill={baseIconColor} />
+                            <Path data={slashPath} stroke="#ef4444" strokeWidth={3} />
+                        </Group>
+                    );
+                } else if (iconLabel.includes('main area') || iconLabel.includes('dining area')) {
+                    const iconPath = "M3 3h7v7H3V3zm11 0h7v7h-7V3zm-11 11h7v7H3v-7zm11 0h7v7h-7v-7z"; // 2x2 Grid
+                    const isMain = iconLabel.includes('main area');
+                    roomIcon = (
+                        <Group x={tw / 2} y={th / 2} scaleX={2.5} scaleY={2.5} offsetX={12} offsetY={12} opacity={isMain ? 0.8 : 0.25}>
                             <Path data={iconPath} fill="black" opacity={0.15} offsetY={1} />
                             <Path data={iconPath} fill="white" opacity={0.25} offsetY={-0.5} />
                             <Path data={iconPath} fill={baseIconColor} />
                         </Group>
                     );
-                } else if (label === 'VIP Area') {
+                } else if (iconLabel.includes('vip area')) {
                     const iconPath = "M5 21h14a2 2 0 0 0 2-2V7l-4.5 9-4.5-9-4.5 9L3 7v12a2 2 0 0 0 2 2Z"; // Crown
                     roomIcon = (
-                        <Group x={tw / 2} y={th / 2} scaleX={2.5} scaleY={2.5} offsetX={12} offsetY={12} opacity={0.35}>
+                        <Group x={tw / 2} y={th / 2} scaleX={2.5} scaleY={2.5} offsetX={12} offsetY={12} opacity={0.8}>
                             <Path data={iconPath} fill="black" opacity={0.15} offsetY={1} />
                             <Path data={iconPath} fill="white" opacity={0.25} offsetY={-0.5} />
                             <Path data={iconPath} fill="#d97706" />
                         </Group>
                     );
-                } else if (label === 'Patio') {
+                } else if (iconLabel.includes('patio')) {
                     const iconPath = "M12 2 3 9h3l-3 7h5V22h4V16h5l-3-7h3L12 2Z"; // Pine/Tree
                     roomIcon = (
-                        <Group x={tw / 2} y={th / 2} scaleX={2.5} scaleY={2.5} offsetX={12} offsetY={12} opacity={0.35}>
+                        <Group x={tw / 2} y={th / 2} scaleX={2.5} scaleY={2.5} offsetX={12} offsetY={12} opacity={0.8}>
                             <Path data={iconPath} fill="black" opacity={0.15} offsetY={1} />
                             <Path data={iconPath} fill="white" opacity={0.25} offsetY={-0.5} />
                             <Path data={iconPath} fill="#16a34a" />
                         </Group>
                     );
-                } else if (label === 'Restroom' || label === 'Bathroom' || label === 'W.C') {
+                } else if (iconLabel.includes('restroom') || iconLabel.includes('bathroom') || iconLabel.includes('w.c')) {
                     const manPath = "M12 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm2 19v-6h4l-4-6H8l-4 6h4v6h4z";
                     const womanPath = "M12 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm2.4 11l1.6 8h-8l1.6-8H6l4-6h4l4 6h-3.6z";
                     roomIcon = (
@@ -201,7 +231,14 @@ export default function KonvaMap({
                         clipWidth={tw}
                         clipHeight={th}
                     >
-                        <Rect width={tw} height={th} fill={bgColor || (label === 'Dining Area' ? COLORS.floor : COLORS.tile)} stroke={strokeColor} strokeWidth={1} />
+                        <Rect
+                            width={tw}
+                            height={th}
+                            fill={bgColor || (isDining ? COLORS.floor : COLORS.tile)}
+                            stroke={strokeColor}
+                            strokeWidth={1}
+                            opacity={isTargetArea ? 0.3 : 1}
+                        />
                         {patternLines}
                         {roomIcon}
                     </Group>
@@ -335,10 +372,9 @@ export default function KonvaMap({
                                 <Circle radius={radius} fill={isSelected ? '#db2777' : '#78350f'} stroke={strokeColorTable} strokeWidth={strokeWidthTable} />
                                 <Circle radius={radius - 3} stroke="#92400e" strokeWidth={1.5} opacity={0.5} />
                                 <Path data={`M ${-radius * 0.7} ${-radius * 0.4} A ${radius} ${radius} 0 0 1 ${radius * 0.7} ${-radius * 0.4}`} stroke="white" strokeWidth={3} opacity={0.15} lineCap="round" />
-                                {chairs.map((_, i) => {
+                                {chairs.map((pos, i) => {
                                     const plateDist = radius * 0.72;
-                                    const angleRad = ((i * 360 / cap) - 90) * Math.PI / 180;
-                                    return <Circle key={`p-${i}`} x={Math.cos(angleRad) * plateDist} y={Math.sin(angleRad) * plateDist} radius={radius * 0.18} fill="#f8fafc" opacity={0.4} />
+                                    return <Circle key={`p-${i}`} x={Math.cos(pos.angle) * plateDist} y={Math.sin(pos.angle) * plateDist} radius={radius * 0.18} fill="#f8fafc" opacity={0.4} />
                                 })}
                             </Group>
                         ) : (
@@ -346,8 +382,40 @@ export default function KonvaMap({
                         )}
 
                         <Group>
-                            <Text x={isRound ? -radius : -tW / 2} y={-12} width={isRound ? radius * 2 : tW} text={String(label)} align="center" fontSize={isRound ? radius * 0.7 : 18} fill="#ffffff" fontStyle="bold" shadowColor="black" shadowBlur={3} />
-                            <Text x={isRound ? -radius : -tW / 2} y={8} width={isRound ? radius * 2 : tW} text={`${cap}p`} align="center" fontSize={isRound ? radius * 0.4 : 12} fill={isSelected ? '#ffffff' : "#fcd34d"} fontStyle="bold" opacity={0.9} />
+                            {reserved ? (
+                                <>
+                                    {/* Red Cover for Reserved Tables */}
+                                    {isRound ? (
+                                        <Circle radius={radius} fill="#ef4444" opacity={0.5} />
+                                    ) : (
+                                        <Rect x={-tW / 2} y={-tH / 2} width={tW} height={tH} fill="#ef4444" opacity={0.5} cornerRadius={4} />
+                                    )}
+                                    <Text
+                                        x={isRound ? -radius : -tW / 2}
+                                        y={-6}
+                                        width={isRound ? radius * 2 : tW}
+                                        text="RESERVED"
+                                        align="center"
+                                        fontSize={isRound ? radius * 0.35 : 10}
+                                        fill="#ffffff"
+                                        fontStyle="bold"
+                                        shadowColor="black"
+                                        shadowBlur={3}
+                                    />
+                                </>
+                            ) : (
+                                <Text
+                                    x={isRound ? -radius : -tW / 2}
+                                    y={isRound ? -radius / 4 : -6}
+                                    width={isRound ? radius * 2 : tW}
+                                    text={`${cap}p`}
+                                    align="center"
+                                    fontSize={isRound ? radius * 0.6 : 16}
+                                    fill={isSelected ? '#ffffff' : "#fcd34d"}
+                                    fontStyle="bold"
+                                    opacity={0.9}
+                                />
+                            )}
                         </Group>
                     </Group>
                 );
