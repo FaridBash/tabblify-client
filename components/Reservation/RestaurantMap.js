@@ -3,55 +3,98 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useLanguage } from '@/context/LanguageContext';
-import { Users, Cigarette, Lock, Plus, Minus, Maximize, ZoomIn, ZoomOut } from 'lucide-react';
+import { Plus, Minus } from 'lucide-react';
 import styles from './RestaurantMap.module.css';
+import dynamic from 'next/dynamic';
 
-const CELL_COLORS = {
-    kitchen: '#3d3d3d', // Solid dark grey/charcoal for kitchen
-    bar: '#2c1a4d', // Solid deep purple for bar
-    toilet: '#2d3748', // Solid slate blue/grey for restrooms
-    plant: '#1a4731', // Solid dark green for plants/decor
-    walkway: 'transparent',
-};
+// Dynamically import the KonvaMap component to avoid SSR issues
+const KonvaMap = dynamic(() => import('./KonvaMap'), {
+    ssr: false,
+    loading: () => <div className={styles.loading}>Initializing Floor Map...</div>
+});
 
-export default function RestaurantMap({ layout, selectedDate, selectedTime, settings, onTableSelect }) {
-    const { t } = useLanguage();
+export default function RestaurantMap({ layout, selectedDate, selectedTime, settings, selectedTable, onTableSelect }) {
+    const { t, language } = useLanguage();
     const [reservedTableIds, setReservedTableIds] = useState(new Set());
     const [blockedTableIds, setBlockedTableIds] = useState(new Set());
-    const [hoveredTable, setHoveredTable] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [zoom, setZoom] = useState(1);
-    const mapRef = useRef(null);
-    const scrollRef = useRef(null);
+    const [loading, setLoading] = useState(false);
+    const [zoom, setZoom] = useState(0.6); // Start slightly zoomed out
+    const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+    const containerRef = useRef(null);
 
-    const gridData = layout?.grid_data || [];
-    const rowHeights = layout?.row_heights || [];
-    const colWidths = layout?.col_widths || [];
+    // Extract items from different possible data structures in the DB
+    const items = useMemo(() => {
+        if (!layout) return [];
+        // If layout itself has items (passed directly or simplified)
+        if (Array.isArray(layout.items)) return layout.items;
+        // If layout is the DB record and contains a 'layout' JSON field (common)
+        if (layout.layout && Array.isArray(layout.layout.items)) return layout.layout.items;
+        // If it's the old 'grid_data' but converted to new structure
+        if (layout.grid_data && Array.isArray(layout.grid_data.items)) return layout.grid_data.items;
+        // Fallback for direct array if layout itself is the items array
+        if (Array.isArray(layout)) return layout;
+        return [];
+    }, [layout]);
     const bufferTime = settings?.buffer_time || 30;
 
-    // Extract unique tables from grid
-    const tablesInGrid = useMemo(() => {
-        const map = new Map();
-        gridData.forEach((row, ri) => {
-            row.forEach((cell, ci) => {
-                if (cell.type === 'table' && cell.tableId) {
-                    if (!map.has(cell.tableId)) {
-                        map.set(cell.tableId, {
-                            tableId: cell.tableId,
-                            label: cell.label,
-                            shape: cell.shape,
-                            capacity: cell.capacity,
-                            cells: [],
-                        });
-                    }
-                    map.get(cell.tableId).cells.push({ row: ri, col: ci });
-                }
-            });
-        });
-        return map;
-    }, [gridData]);
+    // Rich colors matching the provided sketch
+    const COLORS = {
+        available: '#d97706', // Brownish Orange (Table color)
+        availableStroke: '#92400e',
+        reserved: '#ef4444',
+        reservedStroke: '#991b1b',
+        blocked: '#4b5563',
+        blockedStroke: '#1f2937',
+        text: '#ffffff',
+        furniture: '#1e293b', // Dark Slate for chairs/sofas
+        wall: '#0f172a',
+        window: '#bae6fd',
+        plant: '#4ade80',
+        floor: '#78350f', // Dark wood floor
+        tile: '#fef3c7'   // Light tile floor
+    };
 
-    // Fetch reservations and blocks for the selected date/time
+    // Calculate map bounds to auto-set stage size or scrolling
+    const mapBounds = useMemo(() => {
+        if (items.length === 0) return { width: 1000, height: 800 };
+        let maxX = 0, maxY = 0;
+        items.forEach(item => {
+            const right = (item.x || 0) + (item.width || 100);
+            const bottom = (item.y || 0) + (item.height || 100);
+            if (right > maxX) maxX = right;
+            if (bottom > maxY) maxY = bottom;
+        });
+        return { width: maxX + 100, height: maxY + 100 };
+    }, [items]);
+
+    // Update dimensions on resize using ResizeObserver
+    useEffect(() => {
+        if (!containerRef.current) return;
+
+        const observer = new ResizeObserver((entries) => {
+            for (let entry of entries) {
+                const { width, height } = entry.contentRect;
+                if (width > 0 && height > 0) {
+                    setDimensions({ width, height });
+                }
+            }
+        });
+
+        observer.observe(containerRef.current);
+
+        // Initial measurement
+        const initial = containerRef.current.getBoundingClientRect();
+        if (initial.width > 0) {
+            setDimensions({ width: initial.width, height: initial.height });
+        } else {
+            // Fallback for initial render if rect is 0
+            setDimensions({ width: window.innerWidth - 40, height: 400 });
+        }
+
+        return () => observer.disconnect();
+    }, []);
+
+    // Fetch availability
     useEffect(() => {
         if (!selectedDate || !selectedTime) return;
 
@@ -64,7 +107,6 @@ export default function RestaurantMap({ layout, selectedDate, selectedTime, sett
             const endTimeStr = `${String(Math.floor(endMin / 60)).padStart(2, '0')}:${String(endMin % 60).padStart(2, '0')}`;
 
             try {
-                // Fetch reservations that overlap with the selected time
                 const { data: reservations } = await supabase
                     .from('reservations')
                     .select('table_id')
@@ -73,10 +115,8 @@ export default function RestaurantMap({ layout, selectedDate, selectedTime, sett
                     .lte('start_time', endTimeStr)
                     .gte('end_time', selectedTime);
 
-                const reserved = new Set((reservations || []).map(r => r.table_id));
-                setReservedTableIds(reserved);
+                setReservedTableIds(new Set((reservations || []).map(r => r.table_id)));
 
-                // Fetch table blocks
                 const { data: blocks } = await supabase
                     .from('table_blocks')
                     .select('table_id')
@@ -84,8 +124,7 @@ export default function RestaurantMap({ layout, selectedDate, selectedTime, sett
                     .lte('start_time', endTimeStr)
                     .gte('end_time', selectedTime);
 
-                const blocked = new Set((blocks || []).map(b => b.table_id));
-                setBlockedTableIds(blocked);
+                setBlockedTableIds(new Set((blocks || []).map(b => b.table_id)));
             } catch (err) {
                 console.error('Error fetching availability:', err);
             } finally {
@@ -100,200 +139,66 @@ export default function RestaurantMap({ layout, selectedDate, selectedTime, sett
         return !reservedTableIds.has(tableId) && !blockedTableIds.has(tableId);
     };
 
-    const handleTableClick = (tableId) => {
-        if (!isTableAvailable(tableId)) return;
-        const tableInfo = tablesInGrid.get(tableId);
-        if (tableInfo) {
-            onTableSelect({
-                id: tableId,
-                label: tableInfo.label,
-                capacity: tableInfo.capacity,
-                shape: tableInfo.shape,
-            });
-        }
-    };
-
     const handleZoom = (delta) => {
-        setZoom(prev => Math.min(Math.max(0.5, prev + delta), 2.5));
+        setZoom(prev => Math.min(Math.max(0.3, prev + delta), 2.5));
     };
 
-    const resetZoom = () => setZoom(1);
 
-    // Support Ctrl + Wheel zooming
-    useEffect(() => {
-        const handleWheel = (e) => {
-            if (e.ctrlKey) {
-                e.preventDefault();
-                const delta = e.deltaY > 0 ? -0.1 : 0.1;
-                handleZoom(delta);
-            }
-        };
-        const el = mapRef.current;
-        if (el) {
-            el.addEventListener('wheel', handleWheel, { passive: false });
-            return () => el.removeEventListener('wheel', handleWheel);
-        }
-    }, [mapRef]);
-
-    // Determine if a cell belongs to a multi-cell table and if it's the "primary" cell
-    const getTableCellInfo = (cell) => {
-        if (cell.type !== 'table' || !cell.tableId) return null;
-        const table = tablesInGrid.get(cell.tableId);
-        if (!table) return null;
-        return table;
-    };
-
-    const isPrimaryCell = (cell, ri, ci) => {
-        if (cell.type !== 'table' || !cell.tableId) return false;
-        const table = tablesInGrid.get(cell.tableId);
-        if (!table) return false;
-        return table.cells[0].row === ri && table.cells[0].col === ci;
-    };
-
-    // Calculate total grid dimensions
-    const totalWidth = colWidths.reduce((a, b) => a + b, 0);
-    const totalHeight = rowHeights.reduce((a, b) => a + b, 0);
 
     return (
         <div className={styles.wrapper}>
             {/* Legend */}
             <div className={styles.legend}>
                 <div className={styles.legendItem}>
-                    <div className={`${styles.legendDot} ${styles.availableDot}`} />
+                    <div className={styles.legendDot} style={{ background: COLORS.available, border: `1px solid ${COLORS.availableStroke}` }} />
                     {t('Available', 'متاحة')}
                 </div>
                 <div className={styles.legendItem}>
-                    <div className={`${styles.legendDot} ${styles.reservedDot}`} />
+                    <div className={styles.legendDot} style={{ background: COLORS.reserved, border: `1px solid ${COLORS.reservedStroke}` }} />
                     {t('Reserved', 'محجوزة')}
                 </div>
                 <div className={styles.legendItem}>
-                    <div className={`${styles.legendDot} ${styles.blockedDot}`} />
+                    <div className={styles.legendDot} style={{ background: COLORS.blocked, border: `1px solid ${COLORS.blockedStroke}` }} />
                     {t('Blocked', 'محظورة')}
                 </div>
             </div>
 
-            {loading ? (
-                <div className={styles.loading}>{t('Loading map...', 'جاري تحميل الخريطة...')}</div>
-            ) : (
-                <div className={styles.mapContainer} ref={mapRef}>
-                    <div
-                        className={styles.zoomWrapper}
-                        style={{
-                            width: `${totalWidth * zoom}px`,
-                            height: `${totalHeight * zoom}px`,
-                            transition: 'width 0.2s ease, height 0.2s ease'
-                        }}
-                    >
-                        <div
-                            className={styles.grid}
-                            style={{
-                                display: 'grid',
-                                gridTemplateColumns: colWidths.map(w => `${w}px`).join(' '),
-                                gridTemplateRows: rowHeights.map(h => `${h}px`).join(' '),
-                                width: `${totalWidth}px`,
-                                height: `${totalHeight}px`,
-                                transformOrigin: '0 0',
-                                transform: `scale(${zoom})`,
-                                transition: 'transform 0.2s ease'
-                            }}
-                        >
-                            {gridData.map((row, ri) =>
-                                row.map((cell, ci) => {
-                                    const isTable = cell.type === 'table' && cell.tableId;
-                                    const table = isTable ? tablesInGrid.get(cell.tableId) : null;
-                                    const available = isTable ? isTableAvailable(cell.tableId) : false;
-                                    const reserved = isTable ? reservedTableIds.has(cell.tableId) : false;
-                                    const blocked = isTable ? blockedTableIds.has(cell.tableId) : false;
-                                    const primary = isPrimaryCell(cell, ri, ci);
-                                    const isSmokingZone = cell.zone === 'smoking';
-                                    const hasMarkers = cell.markers && cell.markers.length > 0;
+            <div
+                className={styles.mapContainer}
+                ref={containerRef}
+            >
+                {loading ? (
+                    <div className={styles.loading}>{t('Loading availability...', 'جاري التحقق من التوفر...')}</div>
+                ) : items.length === 0 ? (
+                    <div className={styles.loading}>{t('No map layout found', 'لا يوجد تصميم للخريطة')}</div>
+                ) : dimensions.width > 0 && (
+                    <KonvaMap
+                        items={items}
+                        dimensions={dimensions}
+                        zoom={zoom}
+                        COLORS={COLORS}
+                        onTableSelect={onTableSelect}
+                        isTableAvailable={isTableAvailable}
+                        reservedTableIds={reservedTableIds}
+                        blockedTableIds={blockedTableIds}
+                        selectedTable={selectedTable}
+                    />
+                )}
 
-                                    // For multi-cell tables, only render content in the primary cell
-                                    const showTableContent = isTable && primary;
-
-                                    // Calculate span for multi-cell tables
-                                    let colSpan = 1;
-                                    let rowSpan = 1;
-                                    if (showTableContent && table) {
-                                        const cols = table.cells.map(c => c.col);
-                                        const rows = table.cells.map(c => c.row);
-                                        colSpan = Math.max(...cols) - Math.min(...cols) + 1;
-                                        rowSpan = Math.max(...rows) - Math.min(...rows) + 1;
-                                    }
-
-                                    // Skip non-primary cells of multi-cell tables
-                                    if (isTable && !primary) return null;
-
-                                    const bgColor = isTable ? 'transparent' : (CELL_COLORS[cell.type] || 'transparent');
-
-                                    return (
-                                        <div
-                                            key={`${ri}-${ci}`}
-                                            className={`${styles.cell} ${isSmokingZone ? styles.smokingZone : ''}`}
-                                            style={{
-                                                gridColumn: showTableContent ? `${ci + 1} / span ${colSpan}` : undefined,
-                                                gridRow: showTableContent ? `${ri + 1} / span ${rowSpan}` : undefined,
-                                                backgroundColor: bgColor,
-                                            }}
-                                        >
-                                            {/* Wall markers */}
-                                            {hasMarkers && cell.markers.map((m, mi) => (
-                                                m.type === 'wall' && (
-                                                    <div key={mi} className={`${styles.wall} ${styles[`wall${m.dir}`]}`} />
-                                                )
-                                            ))}
-                                            {hasMarkers && cell.markers.map((m, mi) => (
-                                                m.type === 'entry' && (
-                                                    <div key={mi} className={`${styles.entry} ${styles[`entry${m.dir}`]}`} />
-                                                )
-                                            ))}
-
-                                            {/* Table */}
-                                            {showTableContent && (
-                                                <button
-                                                    className={`${styles.tableBtn} ${cell.shape === 'round' ? styles.round : styles.square} ${available ? styles.available : ''} ${reserved ? styles.reserved : ''} ${blocked ? styles.blocked : ''}`}
-                                                    onClick={() => handleTableClick(cell.tableId)}
-                                                    disabled={!available}
-                                                    onMouseEnter={() => setHoveredTable(cell.tableId)}
-                                                    onMouseLeave={() => setHoveredTable(null)}
-                                                >
-                                                    <span className={styles.tableLabel}>{cell.label}</span>
-                                                    <span className={styles.tableCapacity}>
-                                                        <Users size={10} /> {cell.capacity}p
-                                                    </span>
-                                                    {reserved && <Lock size={12} className={styles.lockIcon} />}
-                                                </button>
-                                            )}
-
-                                            {/* Smoking icon */}
-                                            {isSmokingZone && !isTable && (
-                                                <Cigarette size={10} className={styles.smokingIcon} />
-                                            )}
-                                        </div>
-                                    );
-                                })
-                            )}
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Zoom Controls */}
-            {!loading && (
+                {/* Zoom Controls */}
                 <div className={styles.zoomControls}>
-                    <button onClick={() => handleZoom(0.2)} className={styles.zoomBtn} title="Zoom In">
+                    <button onClick={() => handleZoom(0.1)} className={styles.zoomBtn}>
                         <Plus size={18} />
                     </button>
-                    <button onClick={resetZoom} className={styles.zoomBtn} title="Reset Zoom">
+                    <button onClick={() => setZoom(0.8)} className={styles.zoomBtn}>
                         <span style={{ fontSize: '0.7rem', fontWeight: 800 }}>{Math.round(zoom * 100)}%</span>
                     </button>
-                    <button onClick={() => handleZoom(-0.2)} className={styles.zoomBtn} title="Zoom Out">
+                    <button onClick={() => handleZoom(-0.1)} className={styles.zoomBtn}>
                         <Minus size={18} />
                     </button>
                 </div>
-            )}
+            </div>
 
-            {/* Tap instruction */}
             <p className={styles.instruction}>
                 {t('Tap on an available table to select it', 'اضغط على طاولة متاحة لاختيارها')}
             </p>

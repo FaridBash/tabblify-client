@@ -16,7 +16,7 @@ const Header = ({ config }) => {
     const router = useRouter();
     const isHome = pathname === '/' || /^\/t\/[^\/]+$/.test(pathname);
 
-    if (pathname === '/reserve') return null;
+    if (pathname.startsWith('/reserve')) return null;
 
     const languages = [
         { code: 'en', name: 'English', native: 'English' },

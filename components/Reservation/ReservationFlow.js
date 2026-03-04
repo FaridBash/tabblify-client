@@ -80,7 +80,7 @@ export default function ReservationFlow({ initialData }) {
     const BackIcon = isRTL ? ChevronRight : ChevronLeft;
 
     return (
-        <div className={styles.container} style={{ height: '100dvh', overflow: 'hidden' }}>
+        <div className={`${styles.container} reservation-container`} style={{ height: '100%', overflow: 'hidden' }}>
             {/* Fixed Top Section */}
             {step < STEPS.CONFIRM && (
                 <div className={styles.topBar}>
@@ -181,7 +181,16 @@ export default function ReservationFlow({ initialData }) {
                         animate={{ x: 0, opacity: 1 }}
                         exit={{ x: -40, opacity: 0 }}
                         transition={{ duration: 0.25 }}
-                        style={{ width: '100%' }}
+                        style={{
+                            width: '100%',
+                            flex: 1,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            alignSelf: 'stretch',
+                            overflow: 'hidden'
+                        }}
                     >
                         {step === STEPS.DATE && (
                             <DatePicker
@@ -205,6 +214,7 @@ export default function ReservationFlow({ initialData }) {
                                 selectedDate={selectedDate}
                                 selectedTime={selectedTime}
                                 settings={settings}
+                                selectedTable={selectedTable}
                                 onTableSelect={handleTableSelect}
                             />
                         )}

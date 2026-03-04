@@ -100,7 +100,7 @@ export default async function RootLayout({ children }) {
                     }
                     .main-content {
                       min-height: 0 !important;
-                      overflow-y: auto !important;
+                       overflow-y: auto;
                       -webkit-overflow-scrolling: touch;
                       scrollbar-width: none;
                       position: relative;

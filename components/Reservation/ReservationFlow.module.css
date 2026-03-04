@@ -2,13 +2,12 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     width: 100%;
     max-width: 900px;
     margin: 0 auto;
-    height: 95vh;
-    /* Force full viewport height */
+    height: 100%;
     overflow: hidden;
-    /* Prevent global scrolling */
     position: relative;
 }
 
@@ -167,10 +166,13 @@
 /* Step Content */
 .stepContent {
     width: 100%;
-    padding: 15px 20px 20px;
+    height: 100%;
+    margin-top: 20%;
+    padding: 15px 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     flex: 1;
     overflow: hidden;
     /* Internal components handle scrolling */
