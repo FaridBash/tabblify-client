@@ -145,5 +145,5 @@ svg {
 /* Lock scroll when reservation flow is active */
 .main-content:has(.reservation-container) {
   overflow: hidden !important;
-  height: 80vh !important;
+  height: 100% !important;
 }

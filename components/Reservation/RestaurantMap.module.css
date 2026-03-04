@@ -68,13 +68,13 @@
 
 .mapContainer {
     width: 100%;
-    flex: 1;
+    flex: 1.5;
     border: 2px solid var(--primary);
     border-radius: 20px;
     background: #000000 !important;
     /* Pure black for contrast */
     position: relative;
-    min-height: 250px;
+    min-height: 450px;
     overflow: hidden;
     cursor: grab;
     display: flex;
@@ -90,41 +90,51 @@
     transform-origin: 0 0;
 }
 
+.mapFooter {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 15px;
+    padding: 20px 0;
+    flex-shrink: 0;
+}
+
 .instruction {
     color: var(--primary-dim);
     font-size: 0.85rem;
     font-weight: 500;
     text-align: center;
     font-style: italic;
-    flex-shrink: 0;
-    padding: 10px 0;
+    margin: 0;
 }
 
 .zoomControls {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
     display: flex;
-    flex-direction: column;
-    gap: 10px;
-    z-index: 50;
+    flex-direction: row;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    padding: 8px;
+    border-radius: 18px;
+    border: 1px solid rgba(var(--primary-rgb), 0.25);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 .zoomBtn {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(var(--primary-rgb), 0.3);
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(var(--white-rgb), 0.1);
     color: var(--primary-glow);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-    padding: 0;
 }
 
 .zoomBtn:hover {

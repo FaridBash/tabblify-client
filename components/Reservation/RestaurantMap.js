@@ -184,24 +184,26 @@ export default function RestaurantMap({ layout, selectedDate, selectedTime, sett
                         selectedTable={selectedTable}
                     />
                 )}
+            </div>
 
+            <div className={styles.mapFooter}>
                 {/* Zoom Controls */}
                 <div className={styles.zoomControls}>
-                    <button onClick={() => handleZoom(0.1)} className={styles.zoomBtn}>
+                    <button onClick={() => handleZoom(0.1)} className={styles.zoomBtn} title="Zoom In">
                         <Plus size={18} />
                     </button>
-                    <button onClick={() => setZoom(0.8)} className={styles.zoomBtn}>
+                    <button onClick={() => setZoom(0.8)} className={styles.zoomBtn} title="Reset Zoom">
                         <span style={{ fontSize: '0.7rem', fontWeight: 800 }}>{Math.round(zoom * 100)}%</span>
                     </button>
-                    <button onClick={() => handleZoom(-0.1)} className={styles.zoomBtn}>
+                    <button onClick={() => handleZoom(-0.1)} className={styles.zoomBtn} title="Zoom Out">
                         <Minus size={18} />
                     </button>
                 </div>
-            </div>
 
-            <p className={styles.instruction}>
-                {t('Tap on an available table to select it', 'اضغط على طاولة متاحة لاختيارها')}
-            </p>
+                <p className={styles.instruction}>
+                    {t('Tap on an available table to select it', 'اضغط على طاولة متاحة لاختيارها')}
+                </p>
+            </div>
         </div>
     );
 }
