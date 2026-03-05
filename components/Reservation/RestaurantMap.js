@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useLanguage } from '@/context/LanguageContext';
-import { Plus, Minus, Info, X } from 'lucide-react';
+import { Plus, Minus, Info, X, Filter } from 'lucide-react';
 import styles from './RestaurantMap.module.css';
 import dynamic from 'next/dynamic';
 
@@ -15,26 +15,99 @@ const KonvaMap = dynamic(() => import('./KonvaMap'), {
 
 export default function RestaurantMap({ layout, selectedDate, selectedTime, settings, selectedTable, onTableSelect }) {
     const { t, language } = useLanguage();
+    const [activeTableIds, setActiveTableIds] = useState(null);
     const [reservedTableIds, setReservedTableIds] = useState(new Set());
     const [blockedTableIds, setBlockedTableIds] = useState(new Set());
     const [loading, setLoading] = useState(false);
-    const [zoom, setZoom] = useState(0.6); // Start slightly zoomed out
+    const [zoom, setZoom] = useState(0.8);
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+    const [showLegendModal, setShowLegendModal] = useState(false);
+    const [showFilterModal, setShowFilterModal] = useState(false);
+    const [availableFeatures, setAvailableFeatures] = useState([]);
+    const [selectedFeatures, setSelectedFeatures] = useState(new Set());
+    const [filteredTableIds, setFilteredTableIds] = useState(null);
+    const [tempSelectedTable, setTempSelectedTable] = useState(null);
+    const [nextResInfo, setNextResInfo] = useState(null);
+    const [showInfoModal, setShowInfoModal] = useState(false);
     const containerRef = useRef(null);
 
-    // Extract items from different possible data structures in the DB
-    const items = useMemo(() => {
+    // Fetch active tables and features
+    useEffect(() => {
+        const initData = async () => {
+            // Fetch active tables
+            const { data: tables } = await supabase
+                .from('tables')
+                .select('id')
+                .eq('is_active', true);
+
+            if (tables) {
+                setActiveTableIds(new Set(tables.map(t => t.id)));
+            }
+
+            // Fetch available features
+            const { data: features } = await supabase
+                .from('table_features_list')
+                .select('*')
+                .order('name_en');
+
+            if (features) {
+                setAvailableFeatures(features);
+            }
+        };
+        initData();
+    }, []);
+
+    // Filter effect
+    useEffect(() => {
+        if (selectedFeatures.size === 0) {
+            setFilteredTableIds(null);
+            return;
+        }
+
+        const fetchFilteredTables = async () => {
+            const { data } = await supabase
+                .from('table_feature_assignments')
+                .select('table_id')
+                .in('feature_id', Array.from(selectedFeatures));
+
+            if (data) {
+                // If multiple features selected, we might want intersection (AND) or union (OR)
+                // For now, let's do union (OR) - showing tables that have AT LEAST ONE of the selected features
+                setFilteredTableIds(new Set(data.map(t => t.table_id)));
+            }
+        };
+        fetchFilteredTables();
+    }, [selectedFeatures]);
+
+    const toggleFeature = (id) => {
+        const next = new Set(selectedFeatures);
+        if (next.has(id)) next.delete(id);
+        else next.add(id);
+        setSelectedFeatures(next);
+    };
+
+    // Extract raw items from layout
+    const rawItems = useMemo(() => {
         if (!layout) return [];
-        // If layout itself has items (passed directly or simplified)
-        if (Array.isArray(layout.items)) return layout.items;
-        // If layout is the DB record and contains a 'layout' JSON field (common)
-        if (layout.layout && Array.isArray(layout.layout.items)) return layout.layout.items;
-        // If it's the old 'grid_data' but converted to new structure
-        if (layout.grid_data && Array.isArray(layout.grid_data.items)) return layout.grid_data.items;
-        // Fallback for direct array if layout itself is the items array
-        if (Array.isArray(layout)) return layout;
-        return [];
+        let extracted = [];
+        if (Array.isArray(layout.items)) extracted = layout.items;
+        else if (layout.layout && Array.isArray(layout.layout.items)) extracted = layout.layout.items;
+        else if (layout.grid_data && Array.isArray(layout.grid_data.items)) extracted = layout.grid_data.items;
+        else if (Array.isArray(layout)) extracted = layout;
+        return extracted;
     }, [layout]);
+
+    // Filter items to only show active tables
+    const items = useMemo(() => {
+        if (!activeTableIds) return rawItems;
+        return rawItems.filter(item => {
+            if (item.type === 'table') {
+                const tid = item.tableId || item.table_id;
+                return tid && activeTableIds.has(tid);
+            }
+            return true;
+        });
+    }, [rawItems, activeTableIds]);
     const bufferTime = settings?.buffer_time || 30;
 
     // Rich colors matching the provided sketch
@@ -149,11 +222,6 @@ export default function RestaurantMap({ layout, selectedDate, selectedTime, sett
         fetchData();
     }, [selectedDate, selectedTime, bufferTime]);
 
-    const [tempSelectedTable, setTempSelectedTable] = useState(null);
-    const [nextResInfo, setNextResInfo] = useState(null);
-    const [showInfoModal, setShowInfoModal] = useState(false);
-    const [showLegendModal, setShowLegendModal] = useState(false);
-
     const isTableAvailable = (tableId) => {
         return !reservedTableIds.has(tableId) && !blockedTableIds.has(tableId);
     };
@@ -212,13 +280,22 @@ export default function RestaurantMap({ layout, selectedDate, selectedTime, sett
                     </div>
                 </div>
 
-                <button
-                    className={styles.infoTrigger}
-                    onClick={() => setShowLegendModal(true)}
-                    title={t('Map Key', 'مفتاح الخريطة')}
-                >
-                    <Info size={20} />
-                </button>
+                <div className={styles.legendButtons}>
+                    <button
+                        className={`${styles.infoTrigger} ${selectedFeatures.size > 0 ? styles.filterActive : ''}`}
+                        onClick={() => setShowFilterModal(true)}
+                        title={t('Filter', 'تصفية')}
+                    >
+                        <Filter size={18} />
+                    </button>
+                    <button
+                        className={styles.infoTrigger}
+                        onClick={() => setShowLegendModal(true)}
+                        title={t('Map Key', 'مفتاح الخريطة')}
+                    >
+                        <Info size={20} />
+                    </button>
+                </div>
             </div>
 
             <div
@@ -240,6 +317,8 @@ export default function RestaurantMap({ layout, selectedDate, selectedTime, sett
                         reservedTableIds={reservedTableIds}
                         blockedTableIds={blockedTableIds}
                         selectedTable={selectedTable}
+                        isFiltering={filteredTableIds !== null}
+                        filteredTableIds={filteredTableIds}
                     />
                 )}
             </div>
@@ -396,6 +475,43 @@ export default function RestaurantMap({ layout, selectedDate, selectedTime, sett
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {/* Filter Modal */}
+            {showFilterModal && (
+                <div className={styles.modalOverlay} onClick={() => setShowFilterModal(false)}>
+                    <div className={styles.legendModal} onClick={e => e.stopPropagation()}>
+                        <div className={styles.modalHeader}>
+                            <div className={styles.headerTop}>
+                                <h3>{t('Filter by Features', 'تصفية حسب المميزات')}</h3>
+                                <button className={styles.modalClose} onClick={() => setShowFilterModal(false)}>
+                                    <X size={20} />
+                                </button>
+                            </div>
+                            <p className={styles.modalSub}>{t('Highlight tables with specific features', 'إظهار الطاولات التي تحتوي على مميزات معينة')}</p>
+                        </div>
+                        <div className={styles.modalBody}>
+                            <div className={styles.featuresGrid}>
+                                {availableFeatures.map(feature => (
+                                    <button
+                                        key={feature.id}
+                                        className={`${styles.featureTag} ${selectedFeatures.has(feature.id) ? styles.activeFeature : ''}`}
+                                        onClick={() => toggleFeature(feature.id)}
+                                    >
+                                        {t(feature.name_en, feature.name_ar)}
+                                    </button>
+                                ))}
+                            </div>
+                            {selectedFeatures.size > 0 && (
+                                <button
+                                    className={styles.resetBtn}
+                                    onClick={() => setSelectedFeatures(new Set())}
+                                >
+                                    {t('Reset Filter', 'إعادة ضبط')}
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>

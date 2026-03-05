@@ -3,11 +3,13 @@
     flex-direction: column;
     align-items: center;
     width: 100%;
-    max-width: 900px;
     margin: 0 auto;
-    height: 100%;
+    height: 100dvh;
+    /* Use dynamic viewport height */
     overflow: hidden;
+    overflow-x: hidden;
     position: relative;
+    max-width: 100%;
 }
 
 /* Fixed Top Bar */
@@ -32,7 +34,7 @@
     align-items: center;
     justify-content: center;
     width: 100%;
-    max-width: 400px;
+    max-width: 600px;
     gap: 12px;
 }
 
@@ -173,6 +175,7 @@
     justify-content: flex-start;
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     min-height: 0;
 }
@@ -290,15 +293,15 @@
 
 @media (max-width: 600px) {
     .stepTitle {
-        font-size: 1.3rem;
+        font-size: 1.25rem;
     }
 
     .topBar {
-        padding: 12px 15px 8px;
+        padding: 5px 15px 5px;
     }
 
     .stepContent {
-        padding: 20px 15px 30px;
+        padding: 5px 10px 10px;
     }
 
     .progressLine {
@@ -306,8 +309,35 @@
     }
 
     .progressDot {
-        width: 26px;
-        height: 26px;
+        width: 24px;
+        height: 24px;
         font-size: 0.7rem;
+    }
+}
+
+/* Landscape / Short screen responsiveness */
+@media (max-height: 550px) {
+    .topBar {
+        padding: 5px 15px;
+        gap: 5px;
+    }
+
+    .stepTitle {
+        font-size: 1.1rem;
+    }
+
+    .progressDot {
+        width: 20px;
+        height: 20px;
+        font-size: 0.6rem;
+    }
+
+    .progressLine {
+        width: 10px;
+    }
+
+    .headerDateBadge {
+        padding: 2px 8px;
+        font-size: 0.75rem;
     }
 }

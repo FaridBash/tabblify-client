@@ -74,7 +74,7 @@ function getChairPositions(capacity, tW, tH, isRound) {
 
 export default function KonvaMap({
     items, dimensions, zoom, COLORS, onTableSelect, isTableAvailable,
-    reservedTableIds, blockedTableIds, selectedTable
+    reservedTableIds, blockedTableIds, selectedTable, isFiltering, filteredTableIds
 }) {
 
     const renderItem = (item) => {
@@ -355,8 +355,18 @@ export default function KonvaMap({
                 let strokeColorTable = isSelected ? '#db2777' : (reserved ? COLORS.reserved : (blocked ? COLORS.blocked : COLORS.available));
                 let strokeWidthTable = isSelected ? 4 : 2;
 
+                const isMatch = !isFiltering || (filteredTableIds && (filteredTableIds.has(tableId) || filteredTableIds.has(item.table_id)));
+                const itemOpacity = isMatch ? 1 : 0.45;
+
                 return (
-                    <Group key={item.id} x={x} y={y} rotation={rotation} {...commonProps}>
+                    <Group
+                        key={item.id}
+                        x={x}
+                        y={y}
+                        rotation={rotation}
+                        opacity={itemOpacity}
+                        {...commonProps}
+                    >
                         {chairs.map((pos, i) => (
                             <Group key={`chair-${i}`} x={pos.x} y={pos.y} rotation={pos.rotation}>
                                 <Rect x={-10} y={-10} width={20} height={20} fill="#0f172a" cornerRadius={5} shadowBlur={5} shadowColor="black" shadowOpacity={0.4} />
@@ -445,7 +455,23 @@ export default function KonvaMap({
                 {items.filter(i => i.type === ITEM_TYPES.ROOM).map(renderItem)}
             </Layer>
             <Layer>
-                {items.filter(i => i.type !== ITEM_TYPES.ROOM).map(renderItem)}
+                {items.filter(i => i.type !== ITEM_TYPES.ROOM && i.type !== ITEM_TYPES.TABLE).map(renderItem)}
+            </Layer>
+            {isFiltering && (
+                <Layer>
+                    <Rect
+                        x={-5000}
+                        y={-5000}
+                        width={10000}
+                        height={10000}
+                        fill="black"
+                        opacity={0.7}
+                        listening={false}
+                    />
+                </Layer>
+            )}
+            <Layer>
+                {items.filter(i => i.type === ITEM_TYPES.TABLE).map(renderItem)}
             </Layer>
         </Stage>
     );

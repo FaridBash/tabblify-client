@@ -103,3 +103,32 @@
     color: var(--secondary-dark);
     border-color: var(--primary);
 }
+
+@media (max-height: 600px) {
+    .wrapper {
+        padding: 20px 0;
+    }
+
+    .card {
+        padding: 20px 15px;
+        gap: 15px;
+    }
+
+    .title {
+        font-size: 1.5rem;
+    }
+
+    .details {
+        padding: 15px;
+        gap: 8px;
+    }
+
+    .detailRow {
+        font-size: 0.9rem;
+    }
+
+    .statusBadge {
+        padding: 8px 20px;
+        font-size: 0.85rem;
+    }
+}

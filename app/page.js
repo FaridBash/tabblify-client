@@ -14,20 +14,24 @@ export default function RootRedirect() {
 
     return (
         <div className={styles.container}>
-            {/* Background Override for Main Screen */}
-            {(uiConfig?.main_background_mobile_url || uiConfig?.main_background_desktop_url) && (
-                <style dangerouslySetInnerHTML={{
-                    __html: `
+            {/* Layout Adjustments for Home Screen */}
+            <style dangerouslySetInnerHTML={{
+                __html: `
+                .main-content {
+                    padding-bottom: 0 !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                }
+                .app-background {
+                    background-image: url("${uiConfig?.main_background_mobile_url || uiConfig?.background_image_mobile_url}") !important;
+                }
+                @media (min-width: 768px) {
                     .app-background {
-                        background-image: url("${uiConfig.main_background_mobile_url || uiConfig.background_image_mobile_url}") !important;
+                        background-image: url("${uiConfig?.main_background_desktop_url || uiConfig?.background_image_desktop_url}") !important;
                     }
-                    @media (min-width: 768px) {
-                        .app-background {
-                            background-image: url("${uiConfig.main_background_desktop_url || uiConfig.background_image_desktop_url}") !important;
-                        }
-                    }
-                `}} />
-            )}
+                }
+            `}} />
 
             <motion.div
                 className={styles.logoContainer}

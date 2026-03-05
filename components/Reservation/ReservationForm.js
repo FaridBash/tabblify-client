@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useLanguage } from '@/context/LanguageContext';
-import { User, Phone, Users, Clock, Send } from 'lucide-react';
+import { User, Phone, Users, Clock, Send, Mail } from 'lucide-react';
 import styles from './ReservationForm.module.css';
 
 export default function ReservationForm({ table, date, time, settings, onComplete }) {
@@ -19,10 +19,13 @@ export default function ReservationForm({ table, date, time, settings, onComplet
     const defaultEnd = `${String(Math.floor(defaultEndMin / 60)).padStart(2, '0')}:${String(defaultEndMin % 60).padStart(2, '0')}`;
 
     const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
+    const [age, setAge] = useState('');
     const [partySize, setPartySize] = useState(Math.min(2, maxParty));
     const [endTime, setEndTime] = useState(defaultEnd);
     const [notes, setNotes] = useState('');
+    const [termsAccepted, setTermsAccepted] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState('');
 
@@ -42,7 +45,10 @@ export default function ReservationForm({ table, date, time, settings, onComplet
         setError('');
 
         if (!name.trim()) { setError(t('Name is required', 'الاسم مطلوب')); return; }
+        if (!email.trim()) { setError(t('Email is required', 'البريد الإلكتروني مطلوب')); return; }
         if (!phone.trim()) { setError(t('Phone is required', 'رقم الهاتف مطلوب')); return; }
+        if (!age) { setError(t('Age is required', 'العمر مطلوب')); return; }
+        if (!termsAccepted) { setError(t('You must accept the terms', 'يجب الموافقة على الشروط')); return; }
         if (partySize > table.capacity) {
             setError(t(`Max capacity for this table is ${table.capacity}`, `السعة القصوى لهذه الطاولة هي ${table.capacity}`));
             return;
@@ -50,13 +56,15 @@ export default function ReservationForm({ table, date, time, settings, onComplet
 
         setSubmitting(true);
         try {
-            const dateStr = date.toISOString().split('T')[0];
+            const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
             const { data, error: dbError } = await supabase
                 .from('reservations')
                 .insert({
                     table_id: table.id,
                     customer_name: name.trim(),
+                    customer_email: email.trim(),
                     customer_phone: phone.trim(),
+                    customer_age: parseInt(age, 10),
                     party_size: partySize,
                     reservation_date: dateStr,
                     start_time: time,
@@ -125,16 +133,47 @@ export default function ReservationForm({ table, date, time, settings, onComplet
 
                 <div className={styles.field}>
                     <label className={styles.label}>
-                        <Phone size={16} /> {t('Phone Number', 'رقم الهاتف')}
+                        <Mail size={16} /> {t('Email Address', 'البريد الإلكتروني')}
                     </label>
                     <input
-                        type="tel"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        placeholder={t('+961 XX XXX XXX', '+961 XX XXX XXX')}
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder={t('Enter your email', 'أدخل بريدك الإلكتروني')}
                         className={styles.input}
                         required
                     />
+                </div>
+
+                <div className={styles.row}>
+                    <div className={styles.field}>
+                        <label className={styles.label}>
+                            <Phone size={16} /> {t('Phone Number', 'رقم الهاتف')}
+                        </label>
+                        <input
+                            type="tel"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                            placeholder={t('+961 XX XXX XXX', '+961 XX XXX XXX')}
+                            className={styles.input}
+                            required
+                        />
+                    </div>
+                    <div className={styles.field} style={{ flex: 0.5 }}>
+                        <label className={styles.label}>
+                            <User size={16} /> {t('Age', 'العمر')}
+                        </label>
+                        <input
+                            type="number"
+                            min="15"
+                            max="100"
+                            value={age}
+                            onChange={(e) => setAge(e.target.value)}
+                            placeholder={t('18+', '18+')}
+                            className={styles.input}
+                            required
+                        />
+                    </div>
                 </div>
 
                 <div className={styles.row}>
@@ -183,6 +222,28 @@ export default function ReservationForm({ table, date, time, settings, onComplet
                         className={styles.textarea}
                         rows={3}
                     />
+                </div>
+
+                <div className={styles.checkboxContainer}>
+                    <label className={styles.checkboxLabel}>
+                        <input
+                            type="checkbox"
+                            checked={termsAccepted}
+                            onChange={(e) => setTermsAccepted(e.target.checked)}
+                            className={styles.checkbox}
+                            required
+                        />
+                        <span className={styles.checkboxText}>
+                            {t('I agree to the ', 'أوافق على ')}
+                            <a href="#" target="_blank" className={styles.link} onClick={e => e.stopPropagation()}>
+                                {t('Terms of Use', 'شروط الاستخدام')}
+                            </a>
+                            {t(' and ', ' و ')}
+                            <a href="#" target="_blank" className={styles.link} onClick={e => e.stopPropagation()}>
+                                {t('Privacy Policy', 'سياسة الخصوصية')}
+                            </a>
+                        </span>
+                    </label>
                 </div>
 
                 {error && <p className={styles.error}>{error}</p>}

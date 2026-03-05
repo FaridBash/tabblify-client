@@ -78,8 +78,9 @@ export default async function RootLayout({ children }) {
                   __html: `
                     html, body {
                       height: 100dvh !important;
-                      width: 100vw !important;
+                      width: 100% !important;
                       overflow: hidden !important;
+                      overflow-x: hidden !important;
                       position: fixed !important;
                       top: 0 !important;
                       left: 0 !important;
@@ -93,10 +94,11 @@ export default async function RootLayout({ children }) {
                       display: grid !important;
                       grid-template-rows: auto 1fr auto !important;
                       height: 100dvh !important;
-                      width: 100vw !important;
+                      width: 100% !important;
                       position: relative !important;
                       z-index: 10;
                       overflow: hidden !important;
+                      overflow-x: hidden !important;
                     }
                     .main-content {
                       min-height: 0 !important;

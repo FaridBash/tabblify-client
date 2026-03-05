@@ -183,13 +183,11 @@ export default function ReservationFlow({ initialData }) {
                         transition={{ duration: 0.25 }}
                         style={{
                             width: '100%',
-                            flex: 1,
                             display: 'flex',
                             flexDirection: 'column',
                             alignItems: 'center',
-                            justifyContent: 'center',
+                            justifyContent: 'flex-start',
                             alignSelf: 'stretch',
-                            overflow: 'hidden'
                         }}
                     >
                         {step === STEPS.DATE && (

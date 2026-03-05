@@ -80,7 +80,9 @@ export default function TimePicker({ selectedDate, settings, hours, onConfirm })
     const handleScroll = (ref, list, setter) => {
         if (!ref.current) return;
         const top = ref.current.scrollTop;
-        const itemHeight = 60; // Matches CSS
+        // Detect actual item height from the first child or fallback to CSS defaults
+        const firstItem = ref.current.querySelector(`.${styles.drumItem}`);
+        const itemHeight = firstItem ? firstItem.offsetHeight : (window.innerHeight < 600 ? 50 : 60);
         const index = Math.round(top / itemHeight);
         if (list[index] && list[index] !== setter) {
             setter(list[index]);

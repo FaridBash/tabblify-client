@@ -13,7 +13,13 @@ export default function Confirmation({ reservation }) {
 
     const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const date = new Date(reservation.reservation_date);
-    const formattedDate = `${date.getDate()} ${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+    const formattedDate = `${date.getUTCDate()} ${monthNames[date.getUTCMonth()]} ${date.getUTCFullYear()}`;
+
+    // Helper to remove seconds if present (HH:mm:ss -> HH:mm)
+    const formatTimePart = (t) => {
+        if (!t) return '';
+        return t.split(':').slice(0, 2).join(':');
+    };
 
     return (
         <div className={styles.wrapper}>
@@ -57,7 +63,7 @@ export default function Confirmation({ reservation }) {
                     </div>
                     <div className={styles.detailRow}>
                         <Clock size={18} />
-                        <span>{reservation.start_time} – {reservation.end_time}</span>
+                        <span>{formatTimePart(reservation.start_time)} – {formatTimePart(reservation.end_time)}</span>
                     </div>
                     <div className={styles.detailRow}>
                         <Users size={18} />

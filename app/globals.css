@@ -146,4 +146,5 @@ svg {
 .main-content:has(.reservation-container) {
   overflow: hidden !important;
   height: 100% !important;
+  padding-bottom: 0 !important;
 }
