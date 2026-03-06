@@ -9,7 +9,7 @@ import styles from './CategoryList.module.css';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
 import PDFMenu from './PDFMenu';
 
-const CategoryList = ({ initialCategories, menu }) => {
+const CategoryList = ({ initialCategories, menu, basePath }) => {
     const { language, t } = useLanguage();
     const { setHeaderTitle, tableData } = useUI();
 
@@ -22,6 +22,7 @@ const CategoryList = ({ initialCategories, menu }) => {
     }, [menu, t, setHeaderTitle]);
 
     const getCategoryHref = (categoryId) => {
+        if (basePath) return `${basePath}/${categoryId}`;
         return tableData?.table_hash ? `/t/${tableData.table_hash}/menu/${menu.id}/${categoryId}` : `/menu/${menu.id}/${categoryId}`;
     };
 

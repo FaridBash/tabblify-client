@@ -3,7 +3,7 @@
 import React from 'react';
 import { useUI } from '@/context/UIContext';
 import { useLanguage } from '@/context/LanguageContext';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { QrCode, XCircle, Calendar } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -11,8 +11,10 @@ export default function TableErrorModal() {
     const { tableError } = useUI();
     const { t } = useLanguage();
     const router = useRouter();
+    const pathname = usePathname();
 
-    if (!tableError) return null;
+    // Don't show on public routes that don't require a table session
+    if (!tableError || pathname?.startsWith('/menus')) return null;
 
     return (
         <AnimatePresence>

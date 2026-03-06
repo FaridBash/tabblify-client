@@ -39,8 +39,10 @@ function TableParamsHandler() {
         const urlTable = params?.tableId;
         const savedTableJson = localStorage.getItem('restaurant_table_info');
 
-        // Skip table logic on landing page and standalone pages like /reserve
-        if (pathname === '/' || pathname === '/reserve') {
+        // Skip table logic on landing page and public standalone pages
+        const publicPaths = ['/', '/reserve'];
+        const isPublicPath = publicPaths.includes(pathname) || pathname.startsWith('/menus');
+        if (isPublicPath) {
             setTableError(false);
             return;
         }

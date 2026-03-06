@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 import { useUI } from '@/context/UIContext';
-import { Calendar } from 'lucide-react';
+import { Calendar, UtensilsCrossed } from 'lucide-react';
 import { motion } from 'framer-motion';
 import styles from './page.module.css';
 
@@ -69,6 +69,22 @@ export default function RootRedirect() {
                     </span>
                 </motion.button>
             )}
+
+            {uiConfig?.main_show_menu_button !== false &&
+                uiConfig?.main_menu_linked_menus?.length > 0 && (
+                    <motion.button
+                        initial={{ y: 20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.2 }}
+                        className={styles.menuButton}
+                        onClick={() => window.location.href = '/menus'}
+                    >
+                        <UtensilsCrossed className={styles.menuIcon} size={28} />
+                        <span className={styles.menuTitle}>
+                            {t(uiConfig?.main_menu_button_en, uiConfig?.main_menu_button_ar) || t('View Our Menus', 'عرض قوائمنا')}
+                        </span>
+                    </motion.button>
+                )}
         </div>
     );
 }

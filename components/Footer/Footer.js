@@ -50,9 +50,9 @@ const Footer = ({ config }) => {
                 </p>
             )}
 
-            <div className={styles.brandPlaceholder}>
+            {/* <div className={styles.brandPlaceholder}>
                 <span className={styles.brandN}>N</span>
-            </div>
+            </div> */}
         </footer>
     );
 };
