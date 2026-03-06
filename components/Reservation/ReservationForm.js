@@ -6,26 +6,35 @@ import { useLanguage } from '@/context/LanguageContext';
 import { User, Phone, Users, Clock, Send, Mail } from 'lucide-react';
 import styles from './ReservationForm.module.css';
 
-export default function ReservationForm({ table, date, time, settings, onComplete }) {
+export default function ReservationForm({ table, date, time, settings, onComplete, editingReservation }) {
     const { t } = useLanguage();
     const bufferTime = settings?.buffer_time || 60;
     const minParty = settings?.min_party_size || 1;
     const maxParty = settings?.max_party_size || Math.min(table.capacity, 20);
     const autoConfirm = settings?.auto_confirm ?? false;
+    const isEditing = !!editingReservation;
 
     // Calculate default end time
     const [h, m] = time.split(':').map(Number);
     const defaultEndMin = h * 60 + m + bufferTime;
     const defaultEnd = `${String(Math.floor(defaultEndMin / 60)).padStart(2, '0')}:${String(defaultEndMin % 60).padStart(2, '0')}`;
 
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [phone, setPhone] = useState('');
-    const [age, setAge] = useState('');
-    const [partySize, setPartySize] = useState(Math.min(2, maxParty));
-    const [endTime, setEndTime] = useState(defaultEnd);
-    const [notes, setNotes] = useState('');
-    const [termsAccepted, setTermsAccepted] = useState(false);
+    // Pre-fill from editingReservation if available
+    const [name, setName] = useState(editingReservation?.customer_name || '');
+    const [email, setEmail] = useState(editingReservation?.customer_email || '');
+    const [phone, setPhone] = useState(editingReservation?.customer_phone || '');
+    const [age, setAge] = useState(editingReservation?.customer_age?.toString() || '');
+    const [partySize, setPartySize] = useState(
+        editingReservation?.party_size || Math.min(2, maxParty)
+    );
+    const [endTime, setEndTime] = useState(() => {
+        if (editingReservation?.end_time) {
+            return editingReservation.end_time.split(':').slice(0, 2).join(':');
+        }
+        return defaultEnd;
+    });
+    const [notes, setNotes] = useState(editingReservation?.notes || '');
+    const [termsAccepted, setTermsAccepted] = useState(isEditing ? true : false);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState('');
 
@@ -57,35 +66,60 @@ export default function ReservationForm({ table, date, time, settings, onComplet
         setSubmitting(true);
         try {
             const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-            const { data, error: dbError } = await supabase
-                .from('reservations')
-                .insert({
-                    table_id: table.id,
-                    customer_name: name.trim(),
-                    customer_email: email.trim(),
-                    customer_phone: phone.trim(),
-                    customer_age: parseInt(age, 10),
-                    party_size: partySize,
-                    reservation_date: dateStr,
-                    start_time: time,
-                    end_time: endTime,
-                    status: autoConfirm ? 'confirmed' : 'pending',
-                    notes: notes.trim() || null,
-                })
-                .select()
-                .single();
+            const payload = {
+                table_id: table.id,
+                customer_name: name.trim(),
+                customer_email: email.trim(),
+                customer_phone: phone.trim(),
+                customer_age: parseInt(age, 10),
+                party_size: partySize,
+                reservation_date: dateStr,
+                start_time: time,
+                end_time: endTime,
+                notes: notes.trim() || null,
+            };
 
-            if (dbError) throw dbError;
+            let data;
+            if (isEditing) {
+                // Update existing reservation
+                payload.status = editingReservation.status; // Keep original status
+                const { data: updated, error: dbError } = await supabase
+                    .from('reservations')
+                    .update(payload)
+                    .eq('id', editingReservation.id)
+                    .select()
+                    .single();
+                if (dbError) throw dbError;
+                data = updated;
+            } else {
+                // Create new reservation
+                payload.status = autoConfirm ? 'confirmed' : 'pending';
+                const { data: inserted, error: dbError } = await supabase
+                    .from('reservations')
+                    .insert(payload)
+                    .select()
+                    .single();
+                if (dbError) throw dbError;
+                data = inserted;
+            }
+
+            // Persist customer identity for my-reservations lookup
+            localStorage.setItem('restaurant_customer_email', email.trim());
+            localStorage.setItem('restaurant_customer_phone', phone.trim());
 
             onComplete({
                 ...data,
                 tableLabel: table.label,
                 tableCapacity: table.capacity,
-                autoConfirmed: autoConfirm,
+                autoConfirmed: isEditing ? (data.status === 'confirmed') : autoConfirm,
             });
         } catch (err) {
             console.error('Reservation error:', err);
-            setError(t('Failed to submit reservation. Please try again.', 'فشل في إرسال الحجز. يرجى المحاولة مرة أخرى.'));
+            setError(
+                isEditing
+                    ? t('Failed to update reservation. Please try again.', 'فشل في تحديث الحجز. يرجى المحاولة مرة أخرى.')
+                    : t('Failed to submit reservation. Please try again.', 'فشل في إرسال الحجز. يرجى المحاولة مرة أخرى.')
+            );
         } finally {
             setSubmitting(false);
         }
@@ -251,8 +285,12 @@ export default function ReservationForm({ table, date, time, settings, onComplet
                 <button type="submit" className={styles.submitBtn} disabled={submitting}>
                     <Send size={18} />
                     {submitting
-                        ? t('Submitting...', 'جاري الإرسال...')
-                        : t('Confirm Reservation', 'تأكيد الحجز')
+                        ? (isEditing
+                            ? t('Updating...', 'جاري التحديث...')
+                            : t('Submitting...', 'جاري الإرسال...'))
+                        : (isEditing
+                            ? t('Update Reservation', 'تحديث الحجز')
+                            : t('Confirm Reservation', 'تأكيد الحجز'))
                     }
                 </button>
             </form>

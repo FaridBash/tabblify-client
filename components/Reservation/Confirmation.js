@@ -3,11 +3,11 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
-import { CheckCircle, Clock, Calendar, Users, MapPin, Home } from 'lucide-react';
+import { CheckCircle, Clock, Calendar, Users, MapPin, Home, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 import styles from './Confirmation.module.css';
 
-export default function Confirmation({ reservation }) {
+export default function Confirmation({ reservation, isEditing }) {
     const { t } = useLanguage();
     const router = useRouter();
 
@@ -40,13 +40,15 @@ export default function Confirmation({ reservation }) {
                 </div>
 
                 <h2 className={styles.title}>
-                    {reservation.autoConfirmed
-                        ? t('Reservation Confirmed!', 'تم تأكيد الحجز!')
-                        : t('Reservation Submitted!', 'تم إرسال الحجز!')
+                    {isEditing
+                        ? t('Reservation Updated!', 'تم تحديث الحجز!')
+                        : (reservation.autoConfirmed
+                            ? t('Reservation Confirmed!', 'تم تأكيد الحجز!')
+                            : t('Reservation Submitted!', 'تم إرسال الحجز!'))
                     }
                 </h2>
 
-                {!reservation.autoConfirmed && (
+                {!isEditing && !reservation.autoConfirmed && (
                     <p className={styles.pendingNote}>
                         {t('Your reservation is pending confirmation from the restaurant.', 'حجزك في انتظار تأكيد من المطعم.')}
                     </p>
@@ -78,10 +80,18 @@ export default function Confirmation({ reservation }) {
                     }
                 </div>
 
-                <button className={styles.homeBtn} onClick={() => router.push('/')}>
-                    <Home size={18} />
-                    {t('Back to Home', 'العودة للرئيسية')}
-                </button>
+                <div style={{ display: 'flex', gap: 10, width: '100%', flexDirection: 'column', alignItems: 'center' }}>
+                    {isEditing && (
+                        <button className={styles.homeBtn} onClick={() => router.push('/my-reservations')}>
+                            <ArrowLeft size={18} />
+                            {t('Back to My Reservations', 'العودة لحجوزاتي')}
+                        </button>
+                    )}
+                    <button className={styles.homeBtn} onClick={() => router.push('/')}>
+                        <Home size={18} />
+                        {t('Back to Home', 'العودة للرئيسية')}
+                    </button>
+                </div>
             </motion.div>
         </div>
     );

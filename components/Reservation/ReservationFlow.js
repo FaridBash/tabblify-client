@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/context/LanguageContext';
 import { useUI } from '@/context/UIContext';
 import { ChevronLeft, ChevronRight, Globe, X, Check } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import DatePicker from './DatePicker';
 import TimePicker from './TimePicker';
 import RestaurantMap from './RestaurantMap';
@@ -18,6 +18,7 @@ const STEPS = { DATE: 0, TIME: 1, MAP: 2, FORM: 3, CONFIRM: 4 };
 export default function ReservationFlow({ initialData }) {
     const { layout, settings, hours, closures } = initialData;
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { t, language, setLanguage } = useLanguage();
     const { uiConfig } = useUI();
     const [step, setStep] = useState(STEPS.DATE);
@@ -27,6 +28,31 @@ export default function ReservationFlow({ initialData }) {
     const [selectedTable, setSelectedTable] = useState(null);
     const [reservation, setReservation] = useState(null);
     const isRTL = language === 'ar';
+
+    // ── Editing mode ────────────────────────────────────────────
+    const editId = searchParams.get('edit');
+    const [editingReservation, setEditingReservation] = useState(null);
+    const isEditing = !!editId;
+
+    useEffect(() => {
+        if (editId) {
+            try {
+                const stored = sessionStorage.getItem('editing_reservation');
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    setEditingReservation(parsed);
+                    // Pre-fill date
+                    const d = new Date(parsed.reservation_date + 'T00:00:00');
+                    setSelectedDate(d);
+                    // Pre-fill time
+                    const timeParts = parsed.start_time?.split(':').slice(0, 2).join(':');
+                    setSelectedTime(timeParts || null);
+                }
+            } catch (e) {
+                console.error('Error parsing editing reservation', e);
+            }
+        }
+    }, [editId]);
 
     const languages = [
         { code: 'en', name: 'English', native: 'English' },
@@ -38,13 +64,21 @@ export default function ReservationFlow({ initialData }) {
         setIsLangModalOpen(false);
     };
 
-    const stepTitles = [
-        t('Choose a Date', 'اختر تاريخاً'),
-        t('Pick a Time', 'اختر وقتاً'),
-        t('Select Your Table', 'اختر طاولتك'),
-        t('Your Details', 'بياناتك'),
-        t('Confirmed!', 'تم التأكيد!'),
-    ];
+    const stepTitles = isEditing
+        ? [
+            t('Change Date', 'تغيير التاريخ'),
+            t('Change Time', 'تغيير الوقت'),
+            t('Change Table', 'تغيير الطاولة'),
+            t('Update Details', 'تحديث البيانات'),
+            t('Updated!', 'تم التحديث!'),
+        ]
+        : [
+            t('Choose a Date', 'اختر تاريخاً'),
+            t('Pick a Time', 'اختر وقتاً'),
+            t('Select Your Table', 'اختر طاولتك'),
+            t('Your Details', 'بياناتك'),
+            t('Confirmed!', 'تم التأكيد!'),
+        ];
 
     const totalVisibleSteps = 4; // Date, Time, Map, Form (Confirm is separate)
 
@@ -65,6 +99,10 @@ export default function ReservationFlow({ initialData }) {
     };
 
     const handleReservationComplete = (res) => {
+        // Clean up editing state
+        if (isEditing) {
+            sessionStorage.removeItem('editing_reservation');
+        }
         setReservation(res);
         setStep(STEPS.CONFIRM);
     };
@@ -72,9 +110,18 @@ export default function ReservationFlow({ initialData }) {
     const handleBack = () => {
         if (step > 0) {
             setStep(step - 1);
+        } else if (isEditing) {
+            // Cancel editing — go back to my reservations
+            sessionStorage.removeItem('editing_reservation');
+            router.push('/my-reservations');
         } else {
             router.push('/');
         }
+    };
+
+    const handleCancelEdit = () => {
+        sessionStorage.removeItem('editing_reservation');
+        router.push('/my-reservations');
     };
 
     const BackIcon = isRTL ? ChevronRight : ChevronLeft;
@@ -167,6 +214,14 @@ export default function ReservationFlow({ initialData }) {
                                     } {selectedDate.getFullYear()}
                                 </div>
                             )}
+
+                            {/* Cancel Edit Button — shown during editing */}
+                            {isEditing && (
+                                <button className={styles.cancelEditBtn} onClick={handleCancelEdit}>
+                                    <X size={14} />
+                                    {t('Cancel Edit', 'إلغاء التعديل')}
+                                </button>
+                            )}
                         </motion.div>
                     </AnimatePresence>
                 </div>
@@ -196,6 +251,7 @@ export default function ReservationFlow({ initialData }) {
                                 hours={hours}
                                 closures={closures}
                                 onConfirm={handleDateConfirm}
+                                initialDate={selectedDate}
                             />
                         )}
                         {step === STEPS.TIME && (
@@ -204,6 +260,7 @@ export default function ReservationFlow({ initialData }) {
                                 settings={settings}
                                 hours={hours}
                                 onConfirm={handleTimeConfirm}
+                                initialTime={selectedTime}
                             />
                         )}
                         {step === STEPS.MAP && (
@@ -223,10 +280,14 @@ export default function ReservationFlow({ initialData }) {
                                 time={selectedTime}
                                 settings={settings}
                                 onComplete={handleReservationComplete}
+                                editingReservation={isEditing ? editingReservation : null}
                             />
                         )}
                         {step === STEPS.CONFIRM && (
-                            <Confirmation reservation={reservation} />
+                            <Confirmation
+                                reservation={reservation}
+                                isEditing={isEditing}
+                            />
                         )}
                     </motion.div>
                 </AnimatePresence>

@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 import { useUI } from '@/context/UIContext';
-import { Calendar, UtensilsCrossed } from 'lucide-react';
+import { Calendar, UtensilsCrossed, ClipboardList } from 'lucide-react';
 import { motion } from 'framer-motion';
 import styles from './page.module.css';
 
@@ -85,6 +85,19 @@ export default function RootRedirect() {
                         </span>
                     </motion.button>
                 )}
+
+            <motion.button
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className={styles.myResButton}
+                onClick={() => window.location.assign(window.location.origin + '/my-reservations')}
+            >
+                <ClipboardList className={styles.myResIcon} size={24} />
+                <span className={styles.myResTitle}>
+                    {t('My Reservations', 'حجوزاتي')}
+                </span>
+            </motion.button>
         </div>
     );
 }

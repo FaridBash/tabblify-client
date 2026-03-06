@@ -164,6 +164,28 @@
     font-weight: 700;
 }
 
+/* Cancel Edit Button (shown during editing) */
+.cancelEditBtn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 14px;
+    border-radius: 20px;
+    background: rgba(var(--error-rgb), 0.1);
+    border: 1px solid rgba(var(--error-rgb), 0.25);
+    color: var(--error);
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 4px;
+}
+
+.cancelEditBtn:hover {
+    background: rgba(var(--error-rgb), 0.2);
+    border-color: var(--error);
+}
+
 /* Step Content */
 .stepContent {
     width: 100%;

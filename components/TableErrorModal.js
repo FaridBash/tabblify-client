@@ -14,7 +14,7 @@ export default function TableErrorModal() {
     const pathname = usePathname();
 
     // Don't show on public routes that don't require a table session
-    if (!tableError || pathname?.startsWith('/menus')) return null;
+    if (!tableError || pathname?.startsWith('/menus') || pathname?.startsWith('/my-reservations')) return null;
 
     return (
         <AnimatePresence>

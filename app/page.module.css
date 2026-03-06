@@ -146,6 +146,49 @@
     color: var(--foreground);
 }
 
+/* ── My Reservations Button ─────────────────────────────────── */
+.myResButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    height: 52px;
+    padding: 0 30px;
+    border-radius: 50px;
+    text-decoration: none;
+    background: transparent;
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(var(--white-rgb), 0.15);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: pointer;
+}
+
+.myResTitle {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--foreground);
+    opacity: 0.7;
+    letter-spacing: 0.3px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.myResIcon {
+    color: var(--foreground);
+    opacity: 0.7;
+}
+
+.myResButton:hover {
+    transform: translateY(-3px);
+    background: rgba(var(--primary-rgb), 0.08);
+    border-color: rgba(var(--primary-rgb), 0.35);
+}
+
+.myResButton:hover .myResTitle,
+.myResButton:hover .myResIcon {
+    color: var(--primary-glow);
+    opacity: 1;
+}
+
 @media (max-width: 480px) {
     .homeTitle {
         font-size: 2.5rem;
@@ -161,6 +204,11 @@
     }
 
     .menuButton {
+        width: 100%;
+        max-width: 350px;
+    }
+
+    .myResButton {
         width: 100%;
         max-width: 350px;
     }
