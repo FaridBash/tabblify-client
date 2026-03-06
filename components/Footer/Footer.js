@@ -14,11 +14,26 @@ const Footer = ({ config }) => {
 
     if (pathname.startsWith('/reserve')) return null;
 
-    const bottomText = config ? (
-        isMainScreen && (config.main_bottom_line_en || config.main_bottom_line_ar)
-            ? t(config.main_bottom_line_en, config.main_bottom_line_ar)
-            : t(config.bottom_line_en, config.bottom_line_ar)
-    ) : null;
+    if (isMainScreen && config?.main_show_bottom_line === false) {
+        return null;
+    }
+
+    let bottomText = null;
+    if (config) {
+        if (isMainScreen) {
+            if (config.main_bottom_line_en || config.main_bottom_line_ar) {
+                bottomText = t(config.main_bottom_line_en, config.main_bottom_line_ar);
+            } else {
+                bottomText = t(config.bottom_line_en, config.bottom_line_ar);
+            }
+        } else {
+            bottomText = t(config.bottom_line_en, config.bottom_line_ar);
+        }
+    }
+
+    const finalBottomText = bottomText !== null && bottomText !== ''
+        ? bottomText
+        : (bottomText === '' ? '' : t('Welcome to our Restaurant', 'مرحباً بكم في مطعمنا'));
 
     const { tableNumber } = useUI();
 
@@ -29,9 +44,11 @@ const Footer = ({ config }) => {
                 <span>Table {tableNumber || '??'}</span>
             </div>
 
-            <p className={styles.bottomLine}>
-                {bottomText || t('Welcome to our Restaurant', 'مرحباً بكم في مطعمنا')}
-            </p>
+            {finalBottomText && (
+                <p className={styles.bottomLine}>
+                    {finalBottomText}
+                </p>
+            )}
 
             <div className={styles.brandPlaceholder}>
                 <span className={styles.brandN}>N</span>
