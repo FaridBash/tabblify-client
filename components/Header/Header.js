@@ -30,7 +30,7 @@ const Header = ({ config }) => {
 
     if (pathname === '/') {
         return (
-            <div className={styles.headerActionsOnly}>
+            <div className={`${styles.headerActionsOnly} ${styles.homeHeader}`}>
                 <div className={styles.actions}>
                     <motion.button
                         whileHover={{ scale: 1.05 }}
@@ -123,11 +123,12 @@ const Header = ({ config }) => {
                                 {language === 'ar' ? <ArrowRight size={24} /> : <ArrowLeft size={24} />}
                             </button>
                             <h1 className={styles.pageTitle}>{headerTitle}</h1>
+
                         </motion.div>
                     )}
                 </AnimatePresence>
 
-                {/* Fixed Actions (Language + Table) */}
+                {/* Always show actions, positioned at the top right of the header */}
                 <div className={styles.actions}>
                     <motion.button
                         whileHover={{ scale: 1.05 }}

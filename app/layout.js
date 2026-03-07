@@ -39,7 +39,7 @@ export default async function RootLayout({ children }) {
   const theme = uiConfig?.themes;
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" dir="ltr" suppressHydrationWarning>
       <body suppressHydrationWarning>
         <LanguageProvider>
           <UIProvider initialConfig={uiConfig}>
@@ -106,7 +106,6 @@ export default async function RootLayout({ children }) {
                       -webkit-overflow-scrolling: touch;
                       scrollbar-width: none;
                       position: relative;
-                      padding-bottom: 20px !important;
                     }
                     .main-content::-webkit-scrollbar {
                       display: none;

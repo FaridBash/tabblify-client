@@ -5,7 +5,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { Clock, Calendar } from 'lucide-react';
 import styles from './DateTimePicker.module.css';
 
-export default function TimePicker({ selectedDate, settings, hours, onConfirm }) {
+export default function TimePicker({ selectedDate, settings, hours, onConfirm, initialTime }) {
     const { t, language } = useLanguage();
     const today = new Date();
     const bufferTime = settings?.buffer_time || 30;
@@ -56,7 +56,12 @@ export default function TimePicker({ selectedDate, settings, hours, onConfirm })
         return [...new Set(timeSlots.map(s => s.split(':')[0]))].sort();
     }, [timeSlots]);
 
-    const [activeHour, setActiveHour] = useState(hoursList[0] || '');
+    const [activeHour, setActiveHour] = useState(() => {
+        if (initialTime && hoursList.includes(initialTime.split(':')[0])) {
+            return initialTime.split(':')[0];
+        }
+        return hoursList[0] || '';
+    });
 
     const minutesList = useMemo(() => {
         return timeSlots
@@ -65,17 +70,46 @@ export default function TimePicker({ selectedDate, settings, hours, onConfirm })
             .sort();
     }, [timeSlots, activeHour]);
 
-    const [activeMin, setActiveMin] = useState(minutesList[0] || '');
+    const [activeMin, setActiveMin] = useState(() => {
+        if (initialTime && initialTime.startsWith(activeHour + ':')) {
+            const m = initialTime.split(':')[1];
+            if (minutesList.includes(m)) return m;
+        }
+        return minutesList[0] || '';
+    });
+
+    const hourRef = useRef(null);
+    const minRef = useRef(null);
+
+    // Initial Scroll Effect
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (hourRef.current && activeHour) {
+                const hourIndex = hoursList.indexOf(activeHour);
+                if (hourIndex !== -1) {
+                    const firstItem = hourRef.current.querySelector(`.${styles.drumItem}`);
+                    const itemHeight = firstItem ? firstItem.offsetHeight : 60;
+                    hourRef.current.scrollTo({ top: hourIndex * itemHeight, behavior: 'smooth' });
+                }
+            }
+            if (minRef.current && activeMin) {
+                const minIndex = minutesList.indexOf(activeMin);
+                if (minIndex !== -1) {
+                    const firstItem = minRef.current.querySelector(`.${styles.drumItem}`);
+                    const itemHeight = firstItem ? firstItem.offsetHeight : 60;
+                    minRef.current.scrollTo({ top: minIndex * itemHeight, behavior: 'smooth' });
+                }
+            }
+        }, 100);
+        return () => clearTimeout(timer);
+    }, [hoursList, minutesList]); // Run once when lists are ready
 
     // Reset minute if not available for new hour
     useEffect(() => {
         if (!minutesList.includes(activeMin)) {
             setActiveMin(minutesList[0] || '');
         }
-    }, [activeHour, minutesList, activeMin]);
-
-    const hourRef = useRef(null);
-    const minRef = useRef(null);
+    }, [activeHour, minutesList]);
 
     const handleScroll = (ref, list, setter) => {
         if (!ref.current) return;

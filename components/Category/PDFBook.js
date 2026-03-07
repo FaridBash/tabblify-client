@@ -40,13 +40,20 @@ const PDFBook = ({ pdfUrl }) => {
                 const isMobile = window.innerWidth < 768;
 
                 // Available height for the book (accounting for header and controls)
-                const availableHeight = window.innerHeight - 150;
+                // On desktop, we want more margin around the book
+                const verticalOffset = isMobile ? 150 : 250;
+                const availableHeight = window.innerHeight - verticalOffset;
 
                 // Aspect ratio of a standard A4/Menu page is roughly 1:1.41
-                let targetHeight = Math.min(availableHeight, 1000);
+                // On desktop, we limit the height more to make it smaller
+                const desktopMaxHeight = 700;
+                let targetHeight = isMobile
+                    ? Math.min(availableHeight, 1000)
+                    : Math.min(availableHeight, desktopMaxHeight);
+
                 let targetWidth = targetHeight / 1.41;
 
-                const maxWidth = isMobile ? containerWidth : (containerWidth / 2);
+                const maxWidth = isMobile ? containerWidth : (containerWidth / 2.5); // Smaller on desktop
                 if (targetWidth > maxWidth) {
                     targetWidth = maxWidth;
                     targetHeight = targetWidth * 1.41;

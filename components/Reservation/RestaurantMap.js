@@ -13,7 +13,7 @@ const KonvaMap = dynamic(() => import('./KonvaMap'), {
     loading: () => <div className={styles.loading}>Initializing Floor Map...</div>
 });
 
-export default function RestaurantMap({ layout, selectedDate, selectedTime, settings, selectedTable, onTableSelect }) {
+export default function RestaurantMap({ layout, selectedDate, selectedTime, settings, selectedTable, onTableSelect, editingResId }) {
     const { t, language } = useLanguage();
     const [activeTableIds, setActiveTableIds] = useState(null);
     const [reservedTableIds, setReservedTableIds] = useState(new Set());
@@ -194,6 +194,7 @@ export default function RestaurantMap({ layout, selectedDate, selectedTime, sett
 
                 // Filter for current conflicts
                 const conflicts = (reservations || []).filter(r => {
+                    if (editingResId && r.id === editingResId) return false;
                     return r.start_time <= endTimeStr && r.end_time >= selectedTime;
                 });
                 setReservedTableIds(new Set(conflicts.map(r => r.table_id)));
@@ -321,6 +322,25 @@ export default function RestaurantMap({ layout, selectedDate, selectedTime, sett
                         filteredTableIds={filteredTableIds}
                     />
                 )}
+
+                <div className={styles.mapInsetFooter}>
+                    {/* Zoom Controls */}
+                    <div className={styles.zoomControls}>
+                        <button onClick={() => handleZoom(0.1)} className={styles.zoomBtn} title="Zoom In">
+                            <Plus size={18} />
+                        </button>
+                        <button onClick={() => setZoom(0.8)} className={styles.zoomBtn} title="Reset Zoom">
+                            <span style={{ fontSize: '0.7rem', fontWeight: 800 }}>{Math.round(zoom * 100)}%</span>
+                        </button>
+                        <button onClick={() => handleZoom(-0.1)} className={styles.zoomBtn} title="Zoom Out">
+                            <Minus size={18} />
+                        </button>
+                    </div>
+
+                    <p className={styles.instruction}>
+                        {t('Tap on an available table to select it', 'اضغط على طاولة متاحة لاختيارها')}
+                    </p>
+                </div>
             </div>
 
             {/* Table Info Modal */}
@@ -363,25 +383,6 @@ export default function RestaurantMap({ layout, selectedDate, selectedTime, sett
                     </div>
                 </div>
             )}
-
-            <div className={styles.mapFooter}>
-                {/* Zoom Controls */}
-                <div className={styles.zoomControls}>
-                    <button onClick={() => handleZoom(0.1)} className={styles.zoomBtn} title="Zoom In">
-                        <Plus size={18} />
-                    </button>
-                    <button onClick={() => setZoom(0.8)} className={styles.zoomBtn} title="Reset Zoom">
-                        <span style={{ fontSize: '0.7rem', fontWeight: 800 }}>{Math.round(zoom * 100)}%</span>
-                    </button>
-                    <button onClick={() => handleZoom(-0.1)} className={styles.zoomBtn} title="Zoom Out">
-                        <Minus size={18} />
-                    </button>
-                </div>
-
-                <p className={styles.instruction}>
-                    {t('Tap on an available table to select it', 'اضغط على طاولة متاحة لاختيارها')}
-                </p>
-            </div>
 
             {/* Map Legend Modal */}
             {showLegendModal && (

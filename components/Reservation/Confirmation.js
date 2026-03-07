@@ -11,8 +11,10 @@ export default function Confirmation({ reservation, isEditing }) {
     const { t } = useLanguage();
     const router = useRouter();
 
+    if (!reservation) return null;
+
     const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const date = new Date(reservation.reservation_date);
+    const date = new Date(reservation.reservation_date || new Date());
     const formattedDate = `${date.getUTCDate()} ${monthNames[date.getUTCMonth()]} ${date.getUTCFullYear()}`;
 
     // Helper to remove seconds if present (HH:mm:ss -> HH:mm)

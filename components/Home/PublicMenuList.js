@@ -3,11 +3,19 @@
 import React from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
+import { useUI } from '@/context/UIContext';
 import { motion } from 'framer-motion';
 import styles from './PublicMenuList.module.css';
 
 const PublicMenuList = ({ initialMenus }) => {
     const { t } = useLanguage();
+    const { uiConfig, setHeaderTitle } = useUI();
+
+    React.useEffect(() => {
+        const title = t(uiConfig?.main_menu_button_en, uiConfig?.main_menu_button_ar) || t('View Our Menus', 'عرض قوائمنا');
+        setHeaderTitle(title);
+        // Clear title on unmount if needed, or leave it for the next page to set
+    }, [t, uiConfig, setHeaderTitle]);
 
     const container = {
         hidden: { opacity: 0 },

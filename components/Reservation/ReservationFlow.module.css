@@ -30,16 +30,21 @@
 }
 
 .topBarInner {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     width: 100%;
-    max-width: 600px;
-    gap: 12px;
+    max-width: 1100px;
+    height: 44px;
 }
 
 /* Back Button */
 .backButton {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
     width: 36px;
     height: 36px;
     border-radius: 50%;
@@ -62,10 +67,14 @@
 
 /* Language Button */
 .langButton {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 6px 10px;
+    padding: 6px 12px;
     border-radius: 20px;
     background: rgba(var(--white-rgb), 0.1);
     border: 1px solid rgba(var(--white-rgb), 0.15);
@@ -91,7 +100,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    flex: 1;
 }
 
 .progressStep {
@@ -361,5 +369,43 @@
     .headerDateBadge {
         padding: 2px 8px;
         font-size: 0.75rem;
+    }
+}
+
+.keepStepBtn {
+    margin-top: 20px;
+    padding: 14px 24px;
+    border-radius: 50px;
+    background: rgba(var(--primary-rgb), 0.15);
+    border: 1px dashed var(--primary);
+    color: var(--primary-glow);
+    font-weight: 700;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    max-width: 300px;
+    justify-content: center;
+    animation: fadeIn 0.5s ease both;
+}
+
+.keepStepBtn:hover {
+    background: rgba(var(--primary-rgb), 0.25);
+    transform: translateY(-2px);
+    border-style: solid;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }

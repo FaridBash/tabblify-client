@@ -42,12 +42,16 @@
     position: absolute;
     left: 50%;
     top: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate3d(-50%, -50%, 0);
     font-size: 0.95rem;
-    font-weight: 600;
+    font-weight: 800 !important;
     color: var(--primary);
     white-space: nowrap;
     margin: 0;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    transition: none !important;
+    line-height: 1;
 }
 
 .brandPlaceholder {

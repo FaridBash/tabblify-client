@@ -93,7 +93,7 @@ export default function RootRedirect() {
                 className={styles.myResButton}
                 onClick={() => window.location.assign(window.location.origin + '/my-reservations')}
             >
-                <ClipboardList className={styles.myResIcon} size={24} />
+                <ClipboardList className={styles.myResIcon} size={28} />
                 <span className={styles.myResTitle}>
                     {t('My Reservations', 'حجوزاتي')}
                 </span>

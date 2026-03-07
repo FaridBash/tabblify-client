@@ -14,33 +14,36 @@
 }
 
 .headerActionsOnly {
-    height: 0;
-    width: 0;
+    position: relative;
+    width: 100%;
 }
 
 .subHeader {
-    padding: 15px 20px;
+    padding: 10px 0;
     background: rgba(var(--black-rgb), 0.4);
     backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(var(--white-rgb), 0.1);
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 70px;
+    min-height: 80px;
 }
 
 .subHeaderContent {
     width: 100%;
+    max-width: 1100px;
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
+    padding: 0 20px;
 }
 
 .backButton {
     position: absolute;
-    left: 0;
-    color: white;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -113,14 +116,21 @@
 
 /* FIXED Language Toggle */
 .actions {
-    position: fixed;
-    top: 15px;
-    right: 15px;
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
     z-index: 1001;
     pointer-events: auto;
     display: flex;
     align-items: center;
     gap: 10px;
+}
+
+/* Home screen specific override to stay at the top */
+.homeHeader .actions {
+    top: 30px;
+    transform: none;
 }
 
 .tableBadge {

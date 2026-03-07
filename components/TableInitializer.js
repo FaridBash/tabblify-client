@@ -40,7 +40,7 @@ function TableParamsHandler() {
         const savedTableJson = localStorage.getItem('restaurant_table_info');
 
         // Skip table logic on landing page and public standalone pages
-        const publicPaths = ['/', '/reserve'];
+        const publicPaths = ['/', '/reserve', '/my-reservations'];
         const isPublicPath = publicPaths.includes(pathname) || pathname.startsWith('/menus');
         if (isPublicPath) {
             setTableError(false);

@@ -5,10 +5,16 @@ import { useLanguage } from '@/context/LanguageContext';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import styles from './DateTimePicker.module.css';
 
-export default function DatePicker({ settings, hours, closures, onConfirm }) {
+export default function DatePicker({ settings, hours, closures, onConfirm, initialDate }) {
     const { language } = useLanguage();
     const today = new Date();
-    const [currentMonth, setCurrentMonth] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
+
+    const [currentMonth, setCurrentMonth] = useState(() => {
+        if (initialDate) {
+            return new Date(initialDate.getFullYear(), initialDate.getMonth(), 1);
+        }
+        return new Date(today.getFullYear(), today.getMonth(), 1);
+    });
 
     const maxAdvanceDays = settings?.max_advance_days || 30;
     const maxDate = new Date(today.getTime() + maxAdvanceDays * 86400000);
@@ -87,11 +93,15 @@ export default function DatePicker({ settings, hours, closures, onConfirm }) {
                         const isToday = today.getDate() === day &&
                             today.getMonth() === currentMonth.getMonth() &&
                             today.getFullYear() === currentMonth.getFullYear();
+                        const isSelected = initialDate &&
+                            day === initialDate.getDate() &&
+                            initialDate.getMonth() === currentMonth.getMonth() &&
+                            initialDate.getFullYear() === currentMonth.getFullYear();
 
                         return (
                             <button
                                 key={day}
-                                className={`${styles.dayBtn} ${disabled ? styles.disabled : ''} ${isToday ? styles.today : ''}`}
+                                className={`${styles.dayBtn} ${disabled ? styles.disabled : ''} ${isToday ? styles.today : ''} ${isSelected ? styles.selected : ''}`}
                                 onClick={() => handleDateClick(day)}
                                 disabled={disabled}
                             >

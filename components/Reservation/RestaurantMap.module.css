@@ -87,11 +87,10 @@
     border-radius: 20px;
     background: #000000 !important;
     position: relative;
-    /* Use vh for true vertical responsiveness */
-    /* Reduced default height for better mobile visibility */
-    height: 48vh;
-    min-height: 220px;
-    max-height: 650px;
+    /* Increased height for better visibility */
+    height: 60vh;
+    min-height: 400px;
+    max-height: 750px;
     overflow: hidden;
     cursor: grab;
     display: flex;
@@ -108,36 +107,49 @@
 }
 
 .mapFooter {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    gap: 15px;
-    padding: 20px 0;
-    flex-shrink: 0;
+    display: none;
 }
 
 .instruction {
-    color: var(--primary-dim);
-    font-size: 0.85rem;
-    font-weight: 500;
+    color: var(--white);
+    background: rgba(0, 0, 0, 0.5);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
     text-align: center;
-    font-style: italic;
     margin: 0;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(var(--white-rgb), 0.1);
 }
 
 .zoomControls {
     display: flex;
     flex-direction: row;
     gap: 8px;
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    padding: 8px;
-    border-radius: 18px;
-    border: 1px solid rgba(var(--primary-rgb), 0.25);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    background: rgba(var(--black-rgb, 0, 0, 0), 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 6px;
+    border-radius: 14px;
+    border: 1px solid rgba(var(--primary-rgb), 0.2);
+}
+
+.mapInsetFooter {
+    position: absolute;
+    bottom: 15px;
+    left: 15px;
+    right: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    pointer-events: none;
+    z-index: 50;
+}
+
+.mapInsetFooter>* {
+    pointer-events: auto;
 }
 
 .zoomBtn {
@@ -206,8 +218,8 @@
 
 @media (max-height: 850px) {
     .mapContainer {
-        height: 45vh;
-        min-height: 220px;
+        height: 65vh;
+        min-height: 400px;
     }
 }
 

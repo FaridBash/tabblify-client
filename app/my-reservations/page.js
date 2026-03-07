@@ -69,11 +69,16 @@ export default function MyReservationsPage() {
             if (tableIds.length > 0) {
                 const { data: tableData } = await supabase
                     .from('tables')
-                    .select('id, label, capacity')
+                    .select('id, table_number, capacity')
                     .in('id', tableIds);
 
                 if (tableData) {
-                    tableData.forEach(t => { tableMap[t.id] = t; });
+                    tableData.forEach(t => {
+                        tableMap[t.id] = {
+                            ...t,
+                            label: t.table_number?.toString() || ''
+                        };
+                    });
                 }
             }
 

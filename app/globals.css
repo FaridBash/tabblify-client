@@ -75,7 +75,7 @@ body {
 }
 
 body {
-  transition: var(--transition-smooth);
+  margin: 0;
 }
 
 .glass-card {

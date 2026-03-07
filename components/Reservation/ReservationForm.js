@@ -29,7 +29,11 @@ export default function ReservationForm({ table, date, time, settings, onComplet
     );
     const [endTime, setEndTime] = useState(() => {
         if (editingReservation?.end_time) {
-            return editingReservation.end_time.split(':').slice(0, 2).join(':');
+            const baseEnd = editingReservation.end_time.split(':').slice(0, 2).join(':');
+            // If editing, only use original end time if it's still after the (possibly new) start time
+            if (baseEnd > time) {
+                return baseEnd;
+            }
         }
         return defaultEnd;
     });
@@ -53,6 +57,11 @@ export default function ReservationForm({ table, date, time, settings, onComplet
         e.preventDefault();
         setError('');
 
+        if (!table) {
+            setError(t('No table selected', 'لم يتم اختيار طاولة'));
+            return;
+        }
+
         if (!name.trim()) { setError(t('Name is required', 'الاسم مطلوب')); return; }
         if (!email.trim()) { setError(t('Email is required', 'البريد الإلكتروني مطلوب')); return; }
         if (!phone.trim()) { setError(t('Phone is required', 'رقم الهاتف مطلوب')); return; }
@@ -63,7 +72,13 @@ export default function ReservationForm({ table, date, time, settings, onComplet
             return;
         }
 
+        if (endTime <= time) {
+            setError(t('End time must be after start time', 'نهاية الحجز يجب أن تكون بعد بدايته'));
+            return;
+        }
+
         setSubmitting(true);
+        let resultData = null;
         try {
             const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
             const payload = {
@@ -79,7 +94,6 @@ export default function ReservationForm({ table, date, time, settings, onComplet
                 notes: notes.trim() || null,
             };
 
-            let data;
             if (isEditing) {
                 // Update existing reservation
                 payload.status = editingReservation.status; // Keep original status
@@ -90,7 +104,7 @@ export default function ReservationForm({ table, date, time, settings, onComplet
                     .select()
                     .single();
                 if (dbError) throw dbError;
-                data = updated;
+                resultData = updated;
             } else {
                 // Create new reservation
                 payload.status = autoConfirm ? 'confirmed' : 'pending';
@@ -100,28 +114,38 @@ export default function ReservationForm({ table, date, time, settings, onComplet
                     .select()
                     .single();
                 if (dbError) throw dbError;
-                data = inserted;
+                resultData = inserted;
             }
 
             // Persist customer identity for my-reservations lookup
             localStorage.setItem('restaurant_customer_email', email.trim());
             localStorage.setItem('restaurant_customer_phone', phone.trim());
-
-            onComplete({
-                ...data,
-                tableLabel: table.label,
-                tableCapacity: table.capacity,
-                autoConfirmed: isEditing ? (data.status === 'confirmed') : autoConfirm,
-            });
         } catch (err) {
-            console.error('Reservation error:', err);
+            console.error('Reservation error detailed:', {
+                message: err.message,
+                details: err.details,
+                hint: err.hint,
+                code: err.code,
+                error: err
+            });
             setError(
                 isEditing
                     ? t('Failed to update reservation. Please try again.', 'فشل في تحديث الحجز. يرجى المحاولة مرة أخرى.')
                     : t('Failed to submit reservation. Please try again.', 'فشل في إرسال الحجز. يرجى المحاولة مرة أخرى.')
             );
-        } finally {
-            setSubmitting(false);
+            setSubmitting(false); // Enable button if error occurred
+            return; // Stop here
+        }
+
+        setSubmitting(false);
+
+        if (resultData) {
+            onComplete({
+                ...resultData,
+                tableLabel: table.label,
+                tableCapacity: table.capacity,
+                autoConfirmed: isEditing ? (resultData.status === 'confirmed') : autoConfirm,
+            });
         }
     };
 

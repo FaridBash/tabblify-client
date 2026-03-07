@@ -47,6 +47,16 @@ export default function ReservationFlow({ initialData }) {
                     // Pre-fill time
                     const timeParts = parsed.start_time?.split(':').slice(0, 2).join(':');
                     setSelectedTime(timeParts || null);
+
+                    // Pre-fill table info if attached
+                    if (parsed.tables) {
+                        setSelectedTable({
+                            id: parsed.tables.id,
+                            label: parsed.tables.label || parsed.tables.table_number?.toString(),
+                            capacity: parsed.tables.capacity,
+                            // Shape will be determined by the map layout
+                        });
+                    }
                 }
             } catch (e) {
                 console.error('Error parsing editing reservation', e);
@@ -246,32 +256,66 @@ export default function ReservationFlow({ initialData }) {
                         }}
                     >
                         {step === STEPS.DATE && (
-                            <DatePicker
-                                settings={settings}
-                                hours={hours}
-                                closures={closures}
-                                onConfirm={handleDateConfirm}
-                                initialDate={selectedDate}
-                            />
+                            <>
+                                <DatePicker
+                                    settings={settings}
+                                    hours={hours}
+                                    closures={closures}
+                                    onConfirm={handleDateConfirm}
+                                    initialDate={selectedDate}
+                                />
+                                {isEditing && selectedDate && (
+                                    <button
+                                        className={styles.keepStepBtn}
+                                        onClick={() => setStep(STEPS.TIME)}
+                                    >
+                                        <Check size={18} />
+                                        {t('Keep this Date & Continue', 'البقاء على هذا التاريخ والمتابعة')}
+                                    </button>
+                                )}
+                            </>
                         )}
                         {step === STEPS.TIME && (
-                            <TimePicker
-                                selectedDate={selectedDate}
-                                settings={settings}
-                                hours={hours}
-                                onConfirm={handleTimeConfirm}
-                                initialTime={selectedTime}
-                            />
+                            <>
+                                <TimePicker
+                                    selectedDate={selectedDate}
+                                    settings={settings}
+                                    hours={hours}
+                                    onConfirm={handleTimeConfirm}
+                                    initialTime={selectedTime}
+                                />
+                                {isEditing && selectedTime && (
+                                    <button
+                                        className={styles.keepStepBtn}
+                                        onClick={() => setStep(STEPS.MAP)}
+                                    >
+                                        <Check size={18} />
+                                        {t(`Keep ${selectedTime} & Continue`, `البقاء على الساعة ${selectedTime} والمتابعة`)}
+                                    </button>
+                                )}
+                            </>
                         )}
                         {step === STEPS.MAP && (
-                            <RestaurantMap
-                                layout={layout}
-                                selectedDate={selectedDate}
-                                selectedTime={selectedTime}
-                                settings={settings}
-                                selectedTable={selectedTable}
-                                onTableSelect={handleTableSelect}
-                            />
+                            <>
+                                <RestaurantMap
+                                    layout={layout}
+                                    selectedDate={selectedDate}
+                                    selectedTime={selectedTime}
+                                    settings={settings}
+                                    selectedTable={selectedTable}
+                                    onTableSelect={handleTableSelect}
+                                    editingResId={editId}
+                                />
+                                {isEditing && selectedTable && (
+                                    <button
+                                        className={styles.keepStepBtn}
+                                        onClick={() => setStep(STEPS.FORM)}
+                                    >
+                                        <Check size={18} />
+                                        {t(`Keep Table #${selectedTable.label} & Continue`, `البقاء على طاولة #${selectedTable.label} والمتابعة`)}
+                                    </button>
+                                )}
+                            </>
                         )}
                         {step === STEPS.FORM && (
                             <ReservationForm
