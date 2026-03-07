@@ -41,7 +41,7 @@ function TableParamsHandler() {
 
         // Skip table logic on landing page and public standalone pages
         const publicPaths = ['/', '/reserve', '/my-reservations'];
-        const isPublicPath = publicPaths.includes(pathname) || pathname.startsWith('/menus');
+        const isPublicPath = publicPaths.includes(pathname) || pathname.startsWith('/menus') || pathname.startsWith('/qr');
         if (isPublicPath) {
             setTableError(false);
             return;

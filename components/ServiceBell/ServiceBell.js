@@ -15,11 +15,6 @@ const ServiceBell = () => {
     const [status, setStatus] = useState('idle'); // idle, sending, sent, in-progress, completed
     const pathname = usePathname();
 
-    // Hide bell if not in a table session directory
-    if (!pathname.startsWith('/t/')) {
-        return null;
-    }
-
     // Real-time listener
     useEffect(() => {
         if (!tableData?.id || !guestId) return;
@@ -75,6 +70,11 @@ const ServiceBell = () => {
             supabase.removeChannel(channel);
         };
     }, [tableData?.id, guestId]);
+
+    // Hide bell if not in a table session directory (moved after hooks)
+    if (!pathname.startsWith('/t/')) {
+        return null;
+    }
 
     const handleCallService = async () => {
         if (!tableData?.id || !guestId || status !== 'idle') return;
