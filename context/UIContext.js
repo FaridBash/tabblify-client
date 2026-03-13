@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState } from 'react';
 
 const UIContext = createContext();
 
-export const UIProvider = ({ children, initialConfig }) => {
+export const UIProvider = ({ children, initialConfig, organization }) => {
     const [headerTitle, setHeaderTitle] = useState('');
     const [tableNumber, setTableNumber] = useState(null);
     const [tableData, setTableData] = useState(null);
@@ -29,7 +29,8 @@ export const UIProvider = ({ children, initialConfig }) => {
             tableData, setTableData,
             tableError, setTableError,
             guestId,
-            uiConfig, setUiConfig
+            uiConfig, setUiConfig,
+            organization
         }}>
             {children}
         </UIContext.Provider>

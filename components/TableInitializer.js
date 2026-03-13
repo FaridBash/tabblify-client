@@ -9,16 +9,19 @@ function TableParamsHandler() {
     const pathname = usePathname();
     const router = useRouter();
     const params = useParams();
-    const { setTableNumber, setTableData, setTableError } = useUI();
+    const { setTableNumber, setTableData, setTableError, organization } = useUI();
 
     useEffect(() => {
+        if (!organization) return;
+
         const fetchTableData = async (identifier) => {
             try {
-                // Strictly fetch by hash to prevent manual number entry
+                // Strictly fetch by hash and organization to prevent cross-tenant access
                 const { data, error } = await supabase
                     .from('tables')
                     .select('*')
                     .eq('table_hash', identifier)
+                    .eq('organization_id', organization.id)
                     .eq('is_active', true)
                     .single();
 
@@ -54,6 +57,14 @@ function TableParamsHandler() {
             // URL doesn't have it, but storage does
             try {
                 const savedTable = JSON.parse(savedTableJson);
+
+                // If saved table belongs to a different organization, clear it
+                if (savedTable.organization_id && savedTable.organization_id !== organization.id) {
+                    localStorage.removeItem('restaurant_table_info');
+                    setTableError(true);
+                    return;
+                }
+
                 setTableNumber(savedTable.table_number);
                 if (setTableData) setTableData(savedTable);
 
@@ -71,7 +82,7 @@ function TableParamsHandler() {
             // No URL param and no saved session - this is an unauthorized access attempt
             setTableError(true);
         }
-    }, [pathname, params, router, setTableNumber, setTableData, setTableError]);
+    }, [pathname, params, router, setTableNumber, setTableData, setTableError, organization]);
 
     return null;
 }

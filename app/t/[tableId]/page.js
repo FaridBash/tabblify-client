@@ -1,23 +1,25 @@
 import { supabase } from '@/lib/supabase';
 import MenuList from '@/components/Home/MenuList';
 import styles from './page.module.css';
+import { getOrganization } from '@/lib/org';
 
-async function getMenus(tableIdentifier) {
-  // Strict: If no table hash provided, return no menus
-  if (!tableIdentifier) {
+async function getMenus(tableIdentifier, organizationId) {
+  // Strict: If no table hash provided or organization not identified, return no menus
+  if (!tableIdentifier || !organizationId) {
     return [];
   }
 
-  // If table identifier provided, first find the table strictly by hash
+  // If table identifier provided, first find the table strictly by hash and organization
   const { data: tableData, error: tableError } = await supabase
     .from('tables')
     .select('id')
     .eq('table_hash', tableIdentifier)
+    .eq('organization_id', organizationId)
     .eq('is_active', true)
     .single();
 
   if (tableError || !tableData) {
-    console.error('Table not found or inactive:', tableError);
+    console.error('Table not found or inactive for this organization:', tableError);
     return []; // Strict filtering: if table provided but not found, show nothing
   }
 
@@ -37,14 +39,15 @@ async function getMenus(tableIdentifier) {
   // Extract menus from join result and filter active ones
   return assignments
     .map(a => a.menus)
-    .filter(m => m && m.is_active)
+    .filter(m => m && m.is_active && m.organization_id === organizationId)
     .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
 }
 
 export default async function Home({ params }) {
   const resolvedParams = await params;
   const tableParam = resolvedParams?.tableId;
-  const menus = await getMenus(tableParam);
+  const organization = await getOrganization();
+  const menus = await getMenus(tableParam, organization?.id);
 
   return (
     <div className={styles.container}>

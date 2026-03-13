@@ -15,7 +15,7 @@ import styles from './page.module.css';
 export default function MyReservationsPage() {
     const router = useRouter();
     const { t, language } = useLanguage();
-    const { setHeaderTitle } = useUI();
+    const { setHeaderTitle, organization } = useUI();
 
     const [reservations, setReservations] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -30,6 +30,8 @@ export default function MyReservationsPage() {
     }, [setHeaderTitle, t]);
 
     const fetchReservations = useCallback(async () => {
+        if (!organization) return;
+
         const email = localStorage.getItem('restaurant_customer_email');
         const phone = localStorage.getItem('restaurant_customer_phone');
 
@@ -42,8 +44,10 @@ export default function MyReservationsPage() {
         try {
             setErrorMsg(null);
 
-            // Step 1: Fetch reservations only (more stable than joins)
-            let query = supabase.from('reservations').select('*');
+            // Step 1: Fetch reservations only for this organization
+            let query = supabase.from('reservations')
+                .select('*')
+                .eq('organization_id', organization.id);
 
             if (email && phone) {
                 query = query.or(`customer_email.eq.${email},customer_phone.eq.${phone}`);
@@ -70,6 +74,7 @@ export default function MyReservationsPage() {
                 const { data: tableData } = await supabase
                     .from('tables')
                     .select('id, table_number, capacity')
+                    .eq('organization_id', organization.id)
                     .in('id', tableIds);
 
                 if (tableData) {
@@ -96,7 +101,7 @@ export default function MyReservationsPage() {
         } finally {
             setLoading(false);
         }
-    }, [t]);
+    }, [t, organization]);
 
     useEffect(() => {
         fetchReservations();

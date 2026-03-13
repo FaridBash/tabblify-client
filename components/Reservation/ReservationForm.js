@@ -3,11 +3,13 @@
 import React, { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useLanguage } from '@/context/LanguageContext';
+import { useUI } from '@/context/UIContext';
 import { User, Phone, Users, Clock, Send, Mail } from 'lucide-react';
 import styles from './ReservationForm.module.css';
 
 export default function ReservationForm({ table, date, time, settings, onComplete, editingReservation }) {
     const { t } = useLanguage();
+    const { organization } = useUI();
     const bufferTime = settings?.buffer_time || 60;
     const minParty = settings?.min_party_size || 1;
     const maxParty = settings?.max_party_size || Math.min(table.capacity, 20);
@@ -23,7 +25,6 @@ export default function ReservationForm({ table, date, time, settings, onComplet
     const [name, setName] = useState(editingReservation?.customer_name || '');
     const [email, setEmail] = useState(editingReservation?.customer_email || '');
     const [phone, setPhone] = useState(editingReservation?.customer_phone || '');
-    const [age, setAge] = useState(editingReservation?.customer_age?.toString() || '');
     const [partySize, setPartySize] = useState(
         editingReservation?.party_size || Math.min(2, maxParty)
     );
@@ -65,7 +66,6 @@ export default function ReservationForm({ table, date, time, settings, onComplet
         if (!name.trim()) { setError(t('Name is required', 'الاسم مطلوب')); return; }
         if (!email.trim()) { setError(t('Email is required', 'البريد الإلكتروني مطلوب')); return; }
         if (!phone.trim()) { setError(t('Phone is required', 'رقم الهاتف مطلوب')); return; }
-        if (!age) { setError(t('Age is required', 'العمر مطلوب')); return; }
         if (!termsAccepted) { setError(t('You must accept the terms', 'يجب الموافقة على الشروط')); return; }
         if (partySize > table.capacity) {
             setError(t(`Max capacity for this table is ${table.capacity}`, `السعة القصوى لهذه الطاولة هي ${table.capacity}`));
@@ -82,11 +82,11 @@ export default function ReservationForm({ table, date, time, settings, onComplet
         try {
             const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
             const payload = {
+                organization_id: organization?.id,
                 table_id: table.id,
                 customer_name: name.trim(),
                 customer_email: email.trim(),
                 customer_phone: phone.trim(),
-                customer_age: parseInt(age, 10),
                 party_size: partySize,
                 reservation_date: dateStr,
                 start_time: time,
@@ -101,6 +101,7 @@ export default function ReservationForm({ table, date, time, settings, onComplet
                     .from('reservations')
                     .update(payload)
                     .eq('id', editingReservation.id)
+                    .eq('organization_id', organization?.id)
                     .select()
                     .single();
                 if (dbError) throw dbError;
@@ -121,13 +122,7 @@ export default function ReservationForm({ table, date, time, settings, onComplet
             localStorage.setItem('restaurant_customer_email', email.trim());
             localStorage.setItem('restaurant_customer_phone', phone.trim());
         } catch (err) {
-            console.error('Reservation error detailed:', {
-                message: err.message,
-                details: err.details,
-                hint: err.hint,
-                code: err.code,
-                error: err
-            });
+            console.error('Reservation error detailed:', err);
             setError(
                 isEditing
                     ? t('Failed to update reservation. Please try again.', 'فشل في تحديث الحجز. يرجى المحاولة مرة أخرى.')
@@ -213,21 +208,6 @@ export default function ReservationForm({ table, date, time, settings, onComplet
                             value={phone}
                             onChange={(e) => setPhone(e.target.value)}
                             placeholder={t('+961 XX XXX XXX', '+961 XX XXX XXX')}
-                            className={styles.input}
-                            required
-                        />
-                    </div>
-                    <div className={styles.field} style={{ flex: 0.5 }}>
-                        <label className={styles.label}>
-                            <User size={16} /> {t('Age', 'العمر')}
-                        </label>
-                        <input
-                            type="number"
-                            min="15"
-                            max="100"
-                            value={age}
-                            onChange={(e) => setAge(e.target.value)}
-                            placeholder={t('18+', '18+')}
                             className={styles.input}
                             required
                         />

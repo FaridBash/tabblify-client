@@ -4,11 +4,13 @@ import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { Loader2 } from 'lucide-react';
+import { useUI } from '@/context/UIContext';
 
 export default function QRRedirectPage() {
     const router = useRouter();
     const params = useParams();
     const [invalidQR, setInvalidQR] = useState(false);
+    const { organization } = useUI();
 
     useEffect(() => {
         const hash = params?.hash;
@@ -17,28 +19,32 @@ export default function QRRedirectPage() {
             return;
         }
 
+        // Wait for organization to be available from context
+        if (!organization) return;
+
         const processQRScan = async () => {
             try {
-                // 1. Fetch table details based on the hash
+                // 1. Fetch table details based on the hash and organization
                 const { data: tableData, error: tableError } = await supabase
                     .from('tables')
                     .select('id, table_number')
                     .eq('table_hash', hash)
+                    .eq('organization_id', organization.id)
                     .single();
 
                 if (tableError || !tableData) {
-                    console.error('Invalid Table QR Hash:', tableError);
+                    console.error('Invalid Table QR Hash for this organization:', tableError);
                     setInvalidQR(true);
                     setTimeout(() => router.replace('/'), 3000);
                     return;
                 }
 
                 // 2. Clear old session in local storage completely to ensure clean scan
-                // If they are scanning a new QR code, they should be moved to that table
                 localStorage.setItem('restaurant_table_info', JSON.stringify({
                     table_number: tableData.table_number,
                     table_hash: hash,
-                    id: tableData.id
+                    id: tableData.id,
+                    organization_id: organization.id
                 }));
 
                 // 3. Fallback tracking ID for analytics if not logged in
@@ -51,7 +57,6 @@ export default function QRRedirectPage() {
                             throw new Error('crypto.randomUUID not available');
                         }
                     } catch (e) {
-                        // Completely safe fallback if crypto is undefined (like on unsecure HTTP localhost)
                         deviceId = `device-${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
                     }
                     localStorage.setItem('device_tracker_id', deviceId);
@@ -64,8 +69,9 @@ export default function QRRedirectPage() {
                 // 4. Log the scan directly in the Supabase 'qr_scans' table
                 const { error: insertError } = await supabase.from('qr_scans').insert([
                     {
+                        organization_id: organization.id,
                         table_id: tableData.id,
-                        table_number: tableData.table_number,
+                        table_number: tableData.table_number.toString(),
                         table_hash: hash,
                         user_id: userId,
                         device_id: deviceId
@@ -73,8 +79,7 @@ export default function QRRedirectPage() {
                 ]);
 
                 if (insertError) {
-                    // Suppress and just log this so we still redirect users quickly
-                    console.warn('Scan logged with error or table not yet created:', insertError);
+                    console.warn('Scan logged with error:', insertError);
                 }
 
                 // Quick redirect
@@ -82,19 +87,17 @@ export default function QRRedirectPage() {
 
             } catch (err) {
                 console.error('QR Scan Processing Error:', err);
-                // Fallback redirect
                 router.replace(`/t/${hash}`);
             }
         };
 
-        // Delay slightly just to let any page hydration settle
         const timeoutId = setTimeout(() => {
             processQRScan();
         }, 100);
 
         return () => clearTimeout(timeoutId);
 
-    }, [params, router]);
+    }, [params, router, organization]);
 
     if (invalidQR) {
         return (

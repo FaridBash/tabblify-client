@@ -237,6 +237,24 @@ export default function ReservationFlow({ initialData }) {
                 </div>
             )}
 
+            {/* Warning for Missing Data */}
+            {(!layout || !settings || !hours || hours.length === 0) && step < STEPS.CONFIRM && (
+                <div style={{
+                    margin: '20px',
+                    padding: '20px',
+                    background: 'rgba(239, 68, 68, 0.1)',
+                    border: '1px solid var(--error)',
+                    borderRadius: '12px',
+                    color: 'var(--error)',
+                    textAlign: 'center'
+                }}>
+                    <h3 style={{ marginBottom: '8px' }}>{t('Reservations Unavailable', 'الحجوزات غير متوفرة')}</h3>
+                    <p style={{ fontSize: '14px', opacity: 0.8 }}>
+                        {t('This restaurant has not yet configured its reservation settings or opening hours.', 'هذا المطعم لم يقم بإعداد إعدادات الحجز أو ساعات العمل بعد.')}
+                    </p>
+                </div>
+            )}
+
             {/* Step Content */}
             <div className={styles.stepContent}>
                 <AnimatePresence mode="wait">

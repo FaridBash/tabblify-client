@@ -10,13 +10,16 @@ import TableErrorModal from '@/components/TableErrorModal';
 import ServiceBell from '@/components/ServiceBell/ServiceBell';
 import ThemeInjector from '@/components/ThemeInjector';
 import PopupManager from '@/components/PopupModal';
+import { getOrganization } from '@/lib/org';
 
 export const metadata = {
   title: 'Restaurant Client',
   description: 'Premium Digital Menu',
 };
 
-async function getUIConfig() {
+async function getUIConfig(organizationId) {
+  if (!organizationId) return null;
+
   try {
     const { data, error } = await supabase
       .from('ui_config')
@@ -24,9 +27,17 @@ async function getUIConfig() {
         *,
         themes (*)
       `)
-      .single();
+      .eq('organization_id', organizationId)
+      .order('updated_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
 
-    if (error) throw error;
+    if (error) {
+      if (error.code !== 'PGRST116') { // Ignore "no results" error
+        console.error('Error fetching UI config:', error);
+      }
+      return null;
+    }
     return data;
   } catch (error) {
     console.error('Error fetching UI config:', error);
@@ -35,14 +46,15 @@ async function getUIConfig() {
 }
 
 export default async function RootLayout({ children }) {
-  const uiConfig = await getUIConfig();
+  const organization = await getOrganization();
+  const uiConfig = await getUIConfig(organization?.id);
   const theme = uiConfig?.themes;
 
   return (
     <html lang="en" dir="ltr" suppressHydrationWarning>
       <body suppressHydrationWarning>
         <LanguageProvider>
-          <UIProvider initialConfig={uiConfig}>
+          <UIProvider initialConfig={uiConfig} organization={organization}>
             <ThemeInjector initialTheme={theme} />
             <PopupManager />
             <TableInitializer />
@@ -122,6 +134,7 @@ export default async function RootLayout({ children }) {
                 {uiConfig && (
                   <style dangerouslySetInnerHTML={{
                     __html: `
+                    ${uiConfig.background_image_mobile_url ? `
                     .app-background {
                       position: fixed;
                       inset: 0;
@@ -132,11 +145,14 @@ export default async function RootLayout({ children }) {
                       z-index: -1;
                       transform: translateZ(0);
                     }
+                    ` : ''}
+                    ${uiConfig.background_image_desktop_url ? `
                     @media (min-width: 768px) {
                       .app-background {
                         background-image: url("${uiConfig.background_image_desktop_url}");
                       }
                     }
+                    ` : ''}
                     .app-background::after {
                       content: '';
                       position: absolute;
@@ -158,6 +174,43 @@ export default async function RootLayout({ children }) {
               </div>
             </CartProvider>
           </UIProvider>
+          {/* Debug Footer - Temporary */}
+          {organization && (
+            <div style={{
+              position: 'fixed',
+              bottom: 0,
+              left: 0,
+              right: 0,
+              background: 'rgba(0,0,0,0.8)',
+              color: '#00ff00',
+              fontSize: '10px',
+              padding: '2px 8px',
+              textAlign: 'center',
+              zIndex: 99999,
+              pointerEvents: 'none',
+              fontFamily: 'monospace'
+            }}>
+              Tenant: {organization.name} | Slug: {organization.slug} | ID: {organization.id.slice(0, 8)}
+            </div>
+          )}
+          {!organization && (
+            <div style={{
+              position: 'fixed',
+              bottom: 0,
+              left: 0,
+              right: 0,
+              background: 'rgba(255,0,0,0.8)',
+              color: 'white',
+              fontSize: '10px',
+              padding: '2px 8px',
+              textAlign: 'center',
+              zIndex: 99999,
+              pointerEvents: 'none',
+              fontFamily: 'monospace'
+            }}>
+              Tenant: NOT IDENTIFIED (using fallback or landing page mode)
+            </div>
+          )}
         </LanguageProvider>
       </body>
     </html>

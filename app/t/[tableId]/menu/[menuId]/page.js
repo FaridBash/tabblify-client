@@ -1,14 +1,16 @@
 import { supabase } from '@/lib/supabase';
 import CategoryList from '@/components/Category/CategoryList';
 import styles from './page.module.css';
+import { getOrganization } from '@/lib/org';
 
 export const dynamic = 'force-dynamic';
 
-async function getCategories(menuId) {
+async function getCategories(menuId, organizationId) {
     const { data, error } = await supabase
         .from('categories')
         .select('*')
         .eq('menu_id', menuId)
+        .eq('organization_id', organizationId)
         .order('sort_order', { ascending: true });
 
     if (error) {
@@ -18,11 +20,12 @@ async function getCategories(menuId) {
     return data;
 }
 
-async function getMenu(menuId) {
+async function getMenu(menuId, organizationId) {
     const { data, error } = await supabase
         .from('menus')
         .select('*')
         .eq('id', menuId)
+        .eq('organization_id', organizationId)
         .single();
 
     if (error) return null;
@@ -31,16 +34,18 @@ async function getMenu(menuId) {
 
 export default async function CategoryPage({ params }) {
     const { menuId, tableId } = await params;
+    const organization = await getOrganization();
     const tableHash = tableId;
 
-    // Strict Validation: Must have a table hash
-    if (!tableHash) return <div className={styles.container}></div>;
+    // Strict Validation: Must have a table hash and organization
+    if (!tableHash || !organization) return <div className={styles.container}></div>;
 
-    // Validate table exists and is active
+    // Validate table exists, is active and belongs to this organization
     const { data: table, error: tableError } = await supabase
         .from('tables')
         .select('id')
         .eq('table_hash', tableHash)
+        .eq('organization_id', organization.id)
         .eq('is_active', true)
         .single();
 
@@ -56,8 +61,8 @@ export default async function CategoryPage({ params }) {
 
     if (assignmentError || !assignment) return <div className={styles.container}></div>;
 
-    const categories = await getCategories(menuId);
-    const menu = await getMenu(menuId);
+    const categories = await getCategories(menuId, organization.id);
+    const menu = await getMenu(menuId, organization.id);
 
     return (
         <div className={styles.container}>

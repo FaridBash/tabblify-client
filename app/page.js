@@ -23,14 +23,18 @@ export default function RootRedirect() {
                     align-items: center !important;
                     justify-content: center !important;
                 }
+                ${(uiConfig?.main_background_mobile_url || uiConfig?.background_image_mobile_url) ? `
                 .app-background {
-                    background-image: url("${uiConfig?.main_background_mobile_url || uiConfig?.background_image_mobile_url}") !important;
+                    background-image: url("${uiConfig?.main_background_mobile_url || uiConfig.background_image_mobile_url}") !important;
                 }
+                ` : ''}
+                ${(uiConfig?.main_background_desktop_url || uiConfig?.background_image_desktop_url) ? `
                 @media (min-width: 768px) {
                     .app-background {
-                        background-image: url("${uiConfig?.main_background_desktop_url || uiConfig?.background_image_desktop_url}") !important;
+                        background-image: url("${uiConfig?.main_background_desktop_url || uiConfig.background_image_desktop_url}") !important;
                     }
                 }
+                ` : ''}
             `}} />
 
             <motion.div
@@ -70,21 +74,20 @@ export default function RootRedirect() {
                 </motion.button>
             )}
 
-            {uiConfig?.main_show_menu_button !== false &&
-                uiConfig?.main_menu_linked_menus?.length > 0 && (
-                    <motion.button
-                        initial={{ y: 20, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        transition={{ delay: 0.2 }}
-                        className={styles.menuButton}
-                        onClick={() => window.location.href = '/menus'}
-                    >
-                        <UtensilsCrossed className={styles.menuIcon} size={28} />
-                        <span className={styles.menuTitle}>
-                            {t(uiConfig?.main_menu_button_en, uiConfig?.main_menu_button_ar) || t('View Our Menus', 'عرض قوائمنا')}
-                        </span>
-                    </motion.button>
-                )}
+            {(uiConfig?.main_show_menu_button !== false) && (
+                <motion.button
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                    className={styles.menuButton}
+                    onClick={() => window.location.href = '/menus'}
+                >
+                    <UtensilsCrossed className={styles.menuIcon} size={28} />
+                    <span className={styles.menuTitle}>
+                        {t(uiConfig?.main_menu_button_en, uiConfig?.main_menu_button_ar) || t('View Our Menus', 'عرض قوائمنا')}
+                    </span>
+                </motion.button>
+            )}
 
             <motion.button
                 initial={{ y: 20, opacity: 0 }}

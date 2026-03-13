@@ -10,21 +10,22 @@ import { usePathname } from 'next/navigation';
 import styles from './ServiceBell.module.css';
 
 const ServiceBell = () => {
-    const { tableData, guestId } = useUI();
+    const { tableData, guestId, organization } = useUI();
     const { t } = useLanguage();
     const [status, setStatus] = useState('idle'); // idle, sending, sent, in-progress, completed
     const pathname = usePathname();
 
     // Real-time listener
     useEffect(() => {
-        if (!tableData?.id || !guestId) return;
+        if (!tableData?.id || !guestId || !organization) return;
 
-        // Initial Check: See if there's an active request already
+        // Initial Check: See if there's an active request already for this organization
         const fetchInitialStatus = async () => {
             const { data, error } = await supabase
                 .from('service_requests')
                 .select('status')
                 .eq('guest_id', guestId)
+                .eq('organization_id', organization.id)
                 .order('created_at', { ascending: false })
                 .limit(1);
 
@@ -40,9 +41,9 @@ const ServiceBell = () => {
 
         fetchInitialStatus();
 
-        // Real-time Subscription
+        // Real-time Subscription - Filtered by guestId AND organizationId
         const channel = supabase
-            .channel(`service-requests-${guestId}`)
+            .channel(`service-requests-${organization.id}-${guestId}`)
             .on(
                 'postgres_changes',
                 {
@@ -52,6 +53,9 @@ const ServiceBell = () => {
                     filter: `guest_id=eq.${guestId}`
                 },
                 (payload) => {
+                    // Double check organization ID if filter doesn't support complex ones or for extra safety
+                    if (payload.new?.organization_id !== organization.id) return;
+
                     const newStatus = payload.new?.status || payload.old?.status;
                     if (newStatus === 'completed') {
                         setStatus('completed');
@@ -69,7 +73,7 @@ const ServiceBell = () => {
         return () => {
             supabase.removeChannel(channel);
         };
-    }, [tableData?.id, guestId]);
+    }, [tableData?.id, guestId, organization]);
 
     // Hide bell if not in a table session directory (moved after hooks)
     if (!pathname.startsWith('/t/')) {
@@ -77,7 +81,7 @@ const ServiceBell = () => {
     }
 
     const handleCallService = async () => {
-        if (!tableData?.id || !guestId || status !== 'idle') return;
+        if (!tableData?.id || !guestId || !organization || status !== 'idle') return;
 
         setStatus('sending');
         try {
@@ -85,6 +89,7 @@ const ServiceBell = () => {
                 .from('service_requests')
                 .insert([
                     {
+                        organization_id: organization.id,
                         table_id: tableData.id,
                         guest_id: guestId,
                         status: 'pending',
