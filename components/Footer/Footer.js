@@ -9,10 +9,17 @@ import styles from './Footer.module.css';
 
 const Footer = ({ config }) => {
     const { t } = useLanguage();
-    const pathname = usePathname();
+    const { tableNumber, organization } = useUI();
+    const rawPathname = usePathname();
+
+    let pathname = rawPathname;
+    if (organization?.slug && pathname?.startsWith(`/${organization.slug}`)) {
+        pathname = pathname.slice(organization.slug.length + 1) || '/';
+    }
+
     const isMainScreen = pathname === '/';
 
-    if (pathname.startsWith('/reserve')) return null;
+    if (!organization || pathname.startsWith('/reserve')) return null;
 
     if (isMainScreen && config?.main_show_bottom_line === false) {
         return null;
@@ -34,8 +41,6 @@ const Footer = ({ config }) => {
     const finalBottomText = bottomText !== null && bottomText !== ''
         ? bottomText
         : (bottomText === '' ? '' : t('Welcome to our Restaurant', 'مرحباً بكم في مطعمنا'));
-
-    const { tableNumber } = useUI();
 
     return (
         <footer className={styles.footer}>

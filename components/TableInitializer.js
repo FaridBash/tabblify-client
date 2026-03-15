@@ -6,10 +6,15 @@ import { useUI } from '@/context/UIContext';
 import { supabase } from '@/lib/supabase';
 
 function TableParamsHandler() {
-    const pathname = usePathname();
+    const rawPathname = usePathname();
     const router = useRouter();
     const params = useParams();
     const { setTableNumber, setTableData, setTableError, organization } = useUI();
+
+    let pathname = rawPathname;
+    if (organization?.slug && pathname?.startsWith(`/${organization.slug}`)) {
+        pathname = pathname.slice(organization.slug.length + 1) || '/';
+    }
 
     useEffect(() => {
         if (!organization) return;

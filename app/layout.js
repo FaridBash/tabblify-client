@@ -1,20 +1,15 @@
-import { LanguageProvider } from '@/context/LanguageContext';
-import { CartProvider } from '@/context/CartContext';
-import { UIProvider } from '@/context/UIContext';
 import './globals.css';
 import { supabase } from '@/lib/supabase';
 import Header from '@/components/Header/Header';
 import Footer from '@/components/Footer/Footer';
-import TableInitializer from '@/components/TableInitializer';
-import TableErrorModal from '@/components/TableErrorModal';
-import ServiceBell from '@/components/ServiceBell/ServiceBell';
-import ThemeInjector from '@/components/ThemeInjector';
-import PopupManager from '@/components/PopupModal';
 import { getOrganization } from '@/lib/org';
+import { Providers } from '@/components/Providers';
+import { LanguageProvider } from '@/context/LanguageContext';
+import NotFoundUI from './not-found';
 
 export const metadata = {
-  title: 'Restaurant Client',
-  description: 'Premium Digital Menu',
+  title: 'Tabblify',
+  description: 'Premium Digital Menu & Interactive Experience',
 };
 
 async function getUIConfig(organizationId) {
@@ -33,7 +28,7 @@ async function getUIConfig(organizationId) {
       .maybeSingle();
 
     if (error) {
-      if (error.code !== 'PGRST116') { // Ignore "no results" error
+      if (error.code !== 'PGRST116') {
         console.error('Error fetching UI config:', error);
       }
       return null;
@@ -47,21 +42,27 @@ async function getUIConfig(organizationId) {
 
 export default async function RootLayout({ children }) {
   const organization = await getOrganization();
+  
+  if (organization?.error === 'ORG_NOT_FOUND') {
+    return (
+      <html lang="en" dir="ltr" suppressHydrationWarning>
+        <body suppressHydrationWarning>
+          <LanguageProvider>
+            <NotFoundUI />
+          </LanguageProvider>
+        </body>
+      </html>
+    );
+  }
+
   const uiConfig = await getUIConfig(organization?.id);
   const theme = uiConfig?.themes;
 
   return (
     <html lang="en" dir="ltr" suppressHydrationWarning>
       <body suppressHydrationWarning>
-        <LanguageProvider>
-          <UIProvider initialConfig={uiConfig} organization={organization}>
-            <ThemeInjector initialTheme={theme} />
-            <PopupManager />
-            <TableInitializer />
-            <TableErrorModal />
-            <ServiceBell />
-            <CartProvider>
-              <div className="app-container">
+        <Providers uiConfig={uiConfig} organization={organization} theme={theme}>
+            <div className="app-container">
                 {/* SSR Theme Overrides */}
                 {theme && (
                   <style dangerouslySetInnerHTML={{
@@ -85,7 +86,6 @@ export default async function RootLayout({ children }) {
                     }
                   `}} />
                 )}
-                {/* Core structural styles that must always load */}
                 <style dangerouslySetInnerHTML={{
                   __html: `
                     html, body {
@@ -122,7 +122,6 @@ export default async function RootLayout({ children }) {
                     .main-content::-webkit-scrollbar {
                       display: none;
                     }
-                    /* Clean up mobile UI */
                     #__next-build-watcher, 
                     #webpack-dev-server-client-overlay,
                     .nextjs-static-indicator {
@@ -171,47 +170,46 @@ export default async function RootLayout({ children }) {
                   {children}
                 </main>
                 <Footer config={uiConfig} />
+            </div>
+            
+            {/* Debug Footer */}
+            {organization && (
+              <div style={{
+                position: 'fixed',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                background: 'rgba(0,0,0,0.8)',
+                color: '#00ff00',
+                fontSize: '10px',
+                padding: '2px 8px',
+                textAlign: 'center',
+                zIndex: 99999,
+                pointerEvents: 'none',
+                fontFamily: 'monospace'
+              }}>
+                Tenant: {organization.name} | Slug: {organization.slug} | ID: {organization.id.slice(0, 8)}
               </div>
-            </CartProvider>
-          </UIProvider>
-          {/* Debug Footer - Temporary */}
-          {organization && (
-            <div style={{
-              position: 'fixed',
-              bottom: 0,
-              left: 0,
-              right: 0,
-              background: 'rgba(0,0,0,0.8)',
-              color: '#00ff00',
-              fontSize: '10px',
-              padding: '2px 8px',
-              textAlign: 'center',
-              zIndex: 99999,
-              pointerEvents: 'none',
-              fontFamily: 'monospace'
-            }}>
-              Tenant: {organization.name} | Slug: {organization.slug} | ID: {organization.id.slice(0, 8)}
-            </div>
-          )}
-          {!organization && (
-            <div style={{
-              position: 'fixed',
-              bottom: 0,
-              left: 0,
-              right: 0,
-              background: 'rgba(255,0,0,0.8)',
-              color: 'white',
-              fontSize: '10px',
-              padding: '2px 8px',
-              textAlign: 'center',
-              zIndex: 99999,
-              pointerEvents: 'none',
-              fontFamily: 'monospace'
-            }}>
-              Tenant: NOT IDENTIFIED (using fallback or landing page mode)
-            </div>
-          )}
-        </LanguageProvider>
+            )}
+            {!organization && (
+              <div style={{
+                position: 'fixed',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                background: 'rgba(255,0,0,0.8)',
+                color: 'white',
+                fontSize: '10px',
+                padding: '2px 8px',
+                textAlign: 'center',
+                zIndex: 99999,
+                pointerEvents: 'none',
+                fontFamily: 'monospace'
+              }}>
+                Tabblify Landing Mode
+              </div>
+            )}
+        </Providers>
       </body>
     </html>
   );

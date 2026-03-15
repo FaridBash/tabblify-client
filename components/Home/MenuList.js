@@ -11,6 +11,8 @@ const MenuList = ({ initialMenus }) => {
     const { t } = useLanguage();
     const ui = useUI();
     const tableData = ui?.tableData;
+    const organization = ui?.organization;
+    const basePath = organization?.slug ? `/${organization.slug}` : '';
 
     const container = {
         hidden: { opacity: 0 },
@@ -28,7 +30,7 @@ const MenuList = ({ initialMenus }) => {
     };
 
     const getMenuHref = (menuId) => {
-        return tableData?.table_hash ? `/t/${tableData.table_hash}/menu/${menuId}` : `/menu/${menuId}`;
+        return tableData?.table_hash ? `/t/${tableData.table_hash}/menu/${menuId}` : `${basePath}/menus/${menuId}`;
     };
 
     return (

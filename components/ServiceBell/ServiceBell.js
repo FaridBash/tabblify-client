@@ -13,7 +13,12 @@ const ServiceBell = () => {
     const { tableData, guestId, organization } = useUI();
     const { t } = useLanguage();
     const [status, setStatus] = useState('idle'); // idle, sending, sent, in-progress, completed
-    const pathname = usePathname();
+    const rawPathname = usePathname();
+
+    let pathname = rawPathname;
+    if (organization?.slug && pathname?.startsWith(`/${organization.slug}`)) {
+        pathname = pathname.slice(organization.slug.length + 1) || '/';
+    }
 
     // Real-time listener
     useEffect(() => {
@@ -77,6 +82,11 @@ const ServiceBell = () => {
 
     // Hide bell if not in a table session directory (moved after hooks)
     if (!pathname.startsWith('/t/')) {
+        return null;
+    }
+    
+    // Hide if feature is disabled
+    if (!organization?.features?.includes('calling waiter through emenu')) {
         return null;
     }
 

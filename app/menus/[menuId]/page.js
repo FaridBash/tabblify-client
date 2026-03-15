@@ -44,9 +44,11 @@ export default async function PublicMenuPage({ params }) {
 
     const categories = await getCategories(menuId, organization.id);
 
+    const orgSlugPrefix = organization?.slug ? `/${organization.slug}` : '';
+
     return (
         <div className={styles.container}>
-            <CategoryList initialCategories={categories} menu={menu} basePath={`/menus/${menuId}`} />
+            <CategoryList initialCategories={categories} menu={menu} basePath={`${orgSlugPrefix}/menus/${menuId}`} />
         </div>
     );
 }

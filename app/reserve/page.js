@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import ReservationFlow from '@/components/Reservation/ReservationFlow';
 import { getOrganization } from '@/lib/org';
+import { redirect } from 'next/navigation';
 
 async function getReservationData(organizationId) {
     if (!organizationId) return { layout: null, settings: null, hours: [], closures: [] };
@@ -27,6 +28,11 @@ async function getReservationData(organizationId) {
 
 export default async function ReservePage() {
     const organization = await getOrganization();
+    
+    if (organization && !organization.features?.includes('reservations')) {
+        redirect('/');
+    }
+
     const data = await getReservationData(organization?.id);
 
     return <ReservationFlow initialData={data} />;

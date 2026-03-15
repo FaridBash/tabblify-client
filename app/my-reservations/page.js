@@ -29,6 +29,12 @@ export default function MyReservationsPage() {
         return () => setHeaderTitle('');
     }, [setHeaderTitle, t]);
 
+    useEffect(() => {
+        if (organization && !organization.features?.includes('reservations')) {
+            router.push('/');
+        }
+    }, [organization, router]);
+
     const fetchReservations = useCallback(async () => {
         if (!organization) return;
 

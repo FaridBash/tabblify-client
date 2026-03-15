@@ -7,11 +7,11 @@ import { useUI } from '@/context/UIContext';
 import { motion } from 'framer-motion';
 import styles from './CategoryList.module.css';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
-import PDFMenu from './PDFMenu';
-
+import dynamic from 'next/dynamic';
+const PDFMenu = dynamic(() => import('./PDFMenu'), { ssr: false });
 const CategoryList = ({ initialCategories, menu, basePath }) => {
     const { language, t } = useLanguage();
-    const { setHeaderTitle, tableData } = useUI();
+    const { setHeaderTitle, tableData, organization } = useUI();
 
     useEffect(() => {
         // Set global header title
@@ -23,7 +23,10 @@ const CategoryList = ({ initialCategories, menu, basePath }) => {
 
     const getCategoryHref = (categoryId) => {
         if (basePath) return `${basePath}/${categoryId}`;
-        return tableData?.table_hash ? `/t/${tableData.table_hash}/menu/${menu.id}/${categoryId}` : `/menu/${menu.id}/${categoryId}`;
+        const orgPrefix = organization?.slug ? `/${organization.slug}` : '';
+        return tableData?.table_hash 
+            ? `${orgPrefix}/t/${tableData.table_hash}/menu/${menu.id}/${categoryId}` 
+            : `${orgPrefix}/menu/${menu.id}/${categoryId}`;
     };
 
     const container = {

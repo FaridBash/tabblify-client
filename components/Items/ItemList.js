@@ -6,8 +6,8 @@ import { useUI } from '@/context/UIContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Eye, X } from 'lucide-react';
 import styles from './ItemList.module.css';
-import PDFMenu from '../Category/PDFMenu';
-
+import dynamic from 'next/dynamic';
+const PDFMenu = dynamic(() => import('../Category/PDFMenu'), { ssr: false });
 const ItemList = ({ initialItems, category }) => {
     const { language, t } = useLanguage();
     const { setHeaderTitle } = useUI();

@@ -10,11 +10,18 @@ import { usePathname, useRouter } from 'next/navigation';
 
 const Header = ({ config }) => {
     const { language, setLanguage, t } = useLanguage();
-    const { headerTitle } = useUI();
+    const { headerTitle, organization } = useUI();
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const pathname = usePathname();
+    const rawPathname = usePathname();
     const router = useRouter();
+
+    let pathname = rawPathname;
+    if (organization?.slug && pathname?.startsWith(`/${organization.slug}`)) {
+        pathname = pathname.slice(organization.slug.length + 1) || '/';
+    }
+
     const isHome = pathname === '/' || /^\/t\/[^\/]+$/.test(pathname);
+    const isGenericLanding = isHome && !organization;
 
     if (pathname.startsWith('/reserve')) return null;
 
@@ -30,7 +37,7 @@ const Header = ({ config }) => {
 
     if (pathname === '/') {
         return (
-            <div className={`${styles.headerActionsOnly} ${styles.homeHeader}`}>
+            <div className={`${styles.headerActionsOnly} ${isGenericLanding ? '' : styles.homeHeader}`}>
                 <div className={styles.actions}>
                     <motion.button
                         whileHover={{ scale: 1.05 }}
@@ -87,26 +94,28 @@ const Header = ({ config }) => {
             <header className={`${styles.header} ${isHome ? styles.homeHeader : styles.subHeader}`}>
                 <AnimatePresence mode="popLayout">
                     {isHome ? (
-                        <motion.div
-                            key="home-header"
-                            className={styles.logoContainer}
-                            initial={{ y: -10, opacity: 0 }}
-                            animate={{ y: 0, opacity: 1 }}
-                            exit={{ y: -10, opacity: 0 }}
-                            transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
-                        >
-                            {config?.logo_url && (
-                                <img src={config.logo_url} alt="Logo" className={styles.logo} />
-                            )}
-                            <div className={styles.branding}>
-                                <h1 className={styles.homeTitle}>
-                                    {t(config?.title_en, config?.title_ar)}
-                                </h1>
-                                <p className={styles.subtitle}>
-                                    {t(config?.subtitle_en, config?.subtitle_ar)}
-                                </p>
-                            </div>
-                        </motion.div>
+                        config && (
+                            <motion.div
+                                key="home-header"
+                                className={styles.logoContainer}
+                                initial={{ y: -10, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                exit={{ y: -10, opacity: 0 }}
+                                transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
+                            >
+                                {config?.logo_url && (
+                                    <img src={config.logo_url} alt="Logo" className={styles.logo} />
+                                )}
+                                <div className={styles.branding}>
+                                    <h1 className={styles.homeTitle}>
+                                        {t(config?.title_en, config?.title_ar)}
+                                    </h1>
+                                    <p className={styles.subtitle}>
+                                        {t(config?.subtitle_en, config?.subtitle_ar)}
+                                    </p>
+                                </div>
+                            </motion.div>
+                        )
                     ) : (
                         <motion.div
                             key="sub-header"

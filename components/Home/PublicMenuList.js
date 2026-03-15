@@ -9,7 +9,8 @@ import styles from './PublicMenuList.module.css';
 
 const PublicMenuList = ({ initialMenus }) => {
     const { t } = useLanguage();
-    const { uiConfig, setHeaderTitle } = useUI();
+    const { uiConfig, setHeaderTitle, organization } = useUI();
+    const basePath = organization?.slug ? `/${organization.slug}` : '';
 
     React.useEffect(() => {
         const title = t(uiConfig?.main_menu_button_en, uiConfig?.main_menu_button_ar) || t('View Our Menus', 'عرض قوائمنا');
@@ -41,7 +42,7 @@ const PublicMenuList = ({ initialMenus }) => {
         >
             {initialMenus.map((menu) => (
                 <motion.div key={menu.id} variants={item} className={styles.itemWrapper}>
-                    <Link href={`/menus/${menu.id}`} className={`${styles.menuPill} glass-card glass-card-hover`}>
+                    <Link href={`${basePath}/menus/${menu.id}`} className={`${styles.menuPill} glass-card glass-card-hover`}>
                         <span className={styles.menuTitle}>
                             {t(menu.name_en || menu.title_en, menu.name_ar || menu.title_ar)}
                         </span>

@@ -6,8 +6,13 @@ import { useUI } from '@/context/UIContext';
 import PopupModal from './PopupModal';
 
 export default function PopupManager() {
-    const pathname = usePathname();
-    const { uiConfig } = useUI();
+    const rawPathname = usePathname();
+    const { uiConfig, organization } = useUI();
+
+    let pathname = rawPathname;
+    if (organization?.slug && pathname?.startsWith(`/${organization.slug}`)) {
+        pathname = pathname.slice(organization.slug.length + 1) || '/';
+    }
 
     if (!uiConfig) return null;
 

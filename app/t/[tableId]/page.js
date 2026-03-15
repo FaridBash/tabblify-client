@@ -2,6 +2,7 @@ import { supabase } from '@/lib/supabase';
 import MenuList from '@/components/Home/MenuList';
 import styles from './page.module.css';
 import { getOrganization } from '@/lib/org';
+import RootRedirect from '@/components/Home/RootRedirect';
 
 async function getMenus(tableIdentifier, organizationId) {
   // Strict: If no table hash provided or organization not identified, return no menus
@@ -47,6 +48,13 @@ export default async function Home({ params }) {
   const resolvedParams = await params;
   const tableParam = resolvedParams?.tableId;
   const organization = await getOrganization();
+  
+  const hasEMenu = organization?.features?.includes('emenu');
+
+  if (!hasEMenu) {
+      return <RootRedirect />;
+  }
+
   const menus = await getMenus(tableParam, organization?.id);
 
   return (

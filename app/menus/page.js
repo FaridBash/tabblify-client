@@ -2,6 +2,7 @@ import { supabase } from '@/lib/supabase';
 import PublicMenuList from '@/components/Home/PublicMenuList';
 import styles from './page.module.css';
 import { getOrganization } from '@/lib/org';
+import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
@@ -54,6 +55,11 @@ async function getLinkedMenus(organizationId) {
 
 export default async function MenusPage() {
     const organization = await getOrganization();
+
+    if (organization && !organization.features?.includes('emenu')) {
+        redirect('/');
+    }
+
     const menus = await getLinkedMenus(organization?.id);
 
     return (

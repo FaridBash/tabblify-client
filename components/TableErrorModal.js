@@ -8,13 +8,18 @@ import { QrCode, XCircle, Calendar } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function TableErrorModal() {
-    const { tableError } = useUI();
+    const { tableError, organization } = useUI();
     const { t } = useLanguage();
     const router = useRouter();
-    const pathname = usePathname();
+    const rawPathname = usePathname();
+
+    let pathname = rawPathname;
+    if (organization?.slug && pathname?.startsWith(`/${organization.slug}`)) {
+        pathname = pathname.slice(organization.slug.length + 1) || '/';
+    }
 
     // Don't show on public routes that don't require a table session
-    if (!tableError || pathname?.startsWith('/menus') || pathname?.startsWith('/my-reservations')) return null;
+    if (!tableError || pathname?.startsWith('/menus') || pathname?.startsWith('/my-reservations') || pathname === '/') return null;
 
     return (
         <AnimatePresence>
@@ -92,7 +97,8 @@ export default function TableErrorModal() {
 
                         <button
                             onClick={() => {
-                                window.location.href = '/';
+                                const orgPrefix = organization?.slug ? `/${organization.slug}` : '';
+                                window.location.href = orgPrefix || '/';
                             }}
                             style={{
                                 background: 'var(--primary)',
