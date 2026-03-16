@@ -119,7 +119,7 @@ export default function KonvaMap({
 
                 let strokeColor = tileStroke;
                 if (!strokeColor) {
-                    strokeColor = isDining ? 'rgba(69, 26, 3, 0.4)' : 'rgba(180, 83, 9, 0.2)';
+                    strokeColor = isDining ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.1)';
                 }
 
                 if (linePattern || isDining || isTile) {
@@ -148,7 +148,7 @@ export default function KonvaMap({
                 }
 
                 let roomIcon = null;
-                const baseIconColor = item.textColor || "#64748b";
+                const baseIconColor = item.textColor || COLORS.wall;
                 const iconLabel = label?.toLowerCase() || '';
 
                 if (isKitchen || iconLabel.includes('entry')) {
@@ -247,8 +247,8 @@ export default function KonvaMap({
             case ITEM_TYPES.WALL:
                 return (
                     <Group key={item.id} x={x} y={y} rotation={rotation}>
-                        <Rect width={w} height={h} fill="#1e293b" shadowBlur={10} shadowColor="black" shadowOpacity={0.5} shadowOffsetY={5} cornerRadius={2} />
-                        <Rect width={w} height={h} stroke="#475569" strokeWidth={1} cornerRadius={2} />
+                        <Rect width={w} height={h} fill={COLORS.wall} shadowBlur={10} shadowColor="black" shadowOpacity={0.3} shadowOffsetY={5} cornerRadius={2} />
+                        <Rect width={w} height={h} stroke="rgba(0,0,0,0.1)" strokeWidth={1} cornerRadius={2} />
                     </Group>
                 );
 
@@ -266,7 +266,7 @@ export default function KonvaMap({
                     <Group key={item.id} x={x} y={y} rotation={rotation}>
                         <Path data={`M0,${h / 2} Q${w},0 ${w},${-w}`} stroke="#94a3b8" strokeWidth={1} dash={[4, 4]} />
                         <Rect width={w} height={h} fill="#cbd5e1" cornerRadius={1} shadowBlur={4} shadowColor="black" shadowOpacity={0.3} shadowOffsetY={2} />
-                        <Rect x={0} y={-w} width={h} height={w} fill="#d97706" shadowBlur={6} shadowColor="black" shadowOpacity={0.4} shadowOffsetY={4} />
+                        <Rect x={0} y={-w} width={h} height={w} fill={COLORS.wall} shadowBlur={6} shadowColor="black" shadowOpacity={0.4} shadowOffsetY={4} />
                     </Group>
                 );
 
@@ -275,11 +275,11 @@ export default function KonvaMap({
                 return (
                     <Group key={item.id} x={x} y={y} rotation={rotation}>
                         {Array.from({ length: stoolsCount }).map((_, i) => (
-                            <Circle key={`stool-${i}`} x={20 + i * 40} y={h + 12} radius={10} fill="#334155" stroke="#1e293b" strokeWidth={2} shadowBlur={4} shadowColor="black" shadowOpacity={0.3} />
+                            <Circle key={`stool-${i}`} x={20 + i * 40} y={h + 12} radius={10} fill={COLORS.furniture} stroke="#1e293b" strokeWidth={2} shadowBlur={4} shadowColor="black" shadowOpacity={0.3} />
                         ))}
-                        <Rect width={w} height={h} fill="#78350f" cornerRadius={10} shadowBlur={10} shadowColor="black" shadowOpacity={0.5} />
-                        <Rect x={4} y={4} width={w - 8} height={h - 8} fill="#92400e" cornerRadius={6} />
-                        <Rect x={10} y={10} width={w - 20} height={h - 20} fill="#b45309" cornerRadius={4} />
+                        <Rect width={w} height={h} fill={COLORS.wall} cornerRadius={10} shadowBlur={10} shadowColor="black" shadowOpacity={0.5} />
+                        <Rect x={4} y={4} width={w - 8} height={h - 8} fill={COLORS.wall} stroke="rgba(0,0,0,0.1)" strokeWidth={1} cornerRadius={6} />
+                        <Rect x={10} y={10} width={w - 20} height={h - 20} fill={COLORS.wall} opacity={0.8} cornerRadius={4} />
                     </Group>
                 );
 
@@ -320,12 +320,12 @@ export default function KonvaMap({
             case ITEM_TYPES.SOFA:
                 return (
                     <Group key={item.id} x={x} y={y} rotation={rotation}>
-                        <Rect width={w} height={h} fill="#334155" cornerRadius={8} shadowBlur={8} shadowColor="black" shadowOpacity={0.4} shadowOffsetY={4} />
-                        <Rect x={4} y={4} width={w - 8} height={12} fill="#1e293b" cornerRadius={4} />
-                        <Rect x={4} y={16} width={12} height={h - 20} fill="#475569" cornerRadius={4} />
-                        <Rect x={w - 16} y={16} width={12} height={h - 20} fill="#475569" cornerRadius={4} />
-                        <Rect x={18} y={18} width={(w - 36) / 2 - 2} height={h - 24} fill="#475569" cornerRadius={4} />
-                        <Rect x={18 + (w - 36) / 2 + 2} y={18} width={(w - 36) / 2 - 2} height={h - 24} fill="#475569" cornerRadius={4} />
+                        <Rect width={w} height={h} fill={COLORS.furniture} cornerRadius={8} shadowBlur={8} shadowColor="black" shadowOpacity={0.4} shadowOffsetY={4} />
+                        <Rect x={4} y={4} width={w - 8} height={12} fill="rgba(0,0,0,0.2)" cornerRadius={4} />
+                        <Rect x={4} y={16} width={12} height={h - 20} fill="rgba(255,255,255,0.05)" cornerRadius={4} />
+                        <Rect x={w - 16} y={16} width={12} height={h - 20} fill="rgba(255,255,255,0.05)" cornerRadius={4} />
+                        <Rect x={18} y={18} width={(w - 36) / 2 - 2} height={h - 24} fill={COLORS.available} opacity={0.8} cornerRadius={4} />
+                        <Rect x={18 + (w - 36) / 2 + 2} y={18} width={(w - 36) / 2 - 2} height={h - 24} fill={COLORS.available} opacity={0.8} cornerRadius={4} />
                     </Group>
                 );
 
@@ -369,17 +369,17 @@ export default function KonvaMap({
                     >
                         {chairs.map((pos, i) => (
                             <Group key={`chair-${i}`} x={pos.x} y={pos.y} rotation={pos.rotation}>
-                                <Rect x={-10} y={-10} width={20} height={20} fill="#0f172a" cornerRadius={5} shadowBlur={5} shadowColor="black" shadowOpacity={0.4} />
-                                <Rect x={-8} y={-8} width={16} height={16} fill="#334155" cornerRadius={4} />
-                                <Rect x={-12} y={-12} width={24} height={7} fill="#1e293b" cornerRadius={3} />
-                                <Rect x={-12} y={-13} width={24} height={2} fill="#0f172a" cornerRadius={1} />
+                                <Rect x={-10} y={-10} width={20} height={20} fill="#000000" opacity={0.3} cornerRadius={5} shadowBlur={5} shadowColor="black" shadowOpacity={0.4} />
+                                <Rect x={-8} y={-8} width={16} height={16} fill={COLORS.furniture} cornerRadius={4} />
+                                <Rect x={-12} y={-12} width={24} height={7} fill={COLORS.wall} cornerRadius={3} />
+                                <Rect x={-12} y={-13} width={24} height={2} fill="#000000" opacity={0.4} cornerRadius={1} />
                             </Group>
                         ))}
 
                         {isRound ? (
                             <Group>
                                 <Circle radius={radius + 4} fillRadialGradientStartPoint={{ x: 0, y: 0 }} fillRadialGradientStartRadius={radius} fillRadialGradientEndPoint={{ x: 0, y: 0 }} fillRadialGradientEndRadius={radius + 6} fillRadialGradientColorStops={[0, 'rgba(0,0,0,0.3)', 1, 'transparent']} />
-                                <Circle radius={radius} fill={isSelected ? '#db2777' : '#78350f'} stroke={strokeColorTable} strokeWidth={strokeWidthTable} />
+                                <Circle radius={radius} fill={isSelected ? '#db2777' : COLORS.available} stroke={strokeColorTable} strokeWidth={strokeWidthTable} />
                                 <Circle radius={radius - 3} stroke="#92400e" strokeWidth={1.5} opacity={0.5} />
                                 <Path data={`M ${-radius * 0.7} ${-radius * 0.4} A ${radius} ${radius} 0 0 1 ${radius * 0.7} ${-radius * 0.4}`} stroke="white" strokeWidth={3} opacity={0.15} lineCap="round" />
                                 {chairs.map((pos, i) => {
@@ -388,7 +388,7 @@ export default function KonvaMap({
                                 })}
                             </Group>
                         ) : (
-                            <Rect x={-tW / 2} y={-tH / 2} width={tW} height={tH} fill={isSelected ? '#db2777' : "#b45309"} stroke={strokeColorTable} strokeWidth={strokeWidthTable} cornerRadius={4} shadowBlur={15} shadowColor="black" shadowOffsetY={5} shadowOpacity={0.6} />
+                            <Rect x={-tW / 2} y={-tH / 2} width={tW} height={tH} fill={isSelected ? '#db2777' : COLORS.available} stroke={strokeColorTable} strokeWidth={strokeWidthTable} cornerRadius={4} shadowBlur={15} shadowColor="black" shadowOffsetY={5} shadowOpacity={0.6} />
                         )}
 
                         <Group>
@@ -421,7 +421,7 @@ export default function KonvaMap({
                                     text={`${cap}p`}
                                     align="center"
                                     fontSize={isRound ? radius * 0.6 : 16}
-                                    fill={isSelected ? '#ffffff' : "#fcd34d"}
+                                    fill={isSelected ? '#ffffff' : COLORS.text}
                                     fontStyle="bold"
                                     opacity={0.9}
                                 />
@@ -443,11 +443,11 @@ export default function KonvaMap({
             scaleY={zoom}
         >
             <Layer>
-                <Rect x={-5000} y={-5000} width={10000} height={10000} fill="#f8fafc" />
+                <Rect x={-5000} y={-5000} width={10000} height={10000} fill={COLORS.floor} />
                 {Array.from({ length: 200 }).map((_, i) => (
                     <React.Fragment key={`grid-${i}`}>
-                        <Path data={`M-5000,${i * 50 - 5000} L5000,${i * 50 - 5000}`} stroke="#e2e8f0" strokeWidth={0.5} />
-                        <Path data={`M${i * 50 - 5000},-5000 L${i * 50 - 5000},5000`} stroke="#e2e8f0" strokeWidth={0.5} />
+                        <Path data={`M-5000,${i * 50 - 5000} L5000,${i * 50 - 5000}`} stroke="rgba(255,255,255,0.03)" strokeWidth={0.5} />
+                        <Path data={`M${i * 50 - 5000},-5000 L${i * 50 - 5000},5000`} stroke="rgba(255,255,255,0.03)" strokeWidth={0.5} />
                     </React.Fragment>
                 ))}
             </Layer>

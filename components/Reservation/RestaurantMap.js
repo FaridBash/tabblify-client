@@ -127,19 +127,19 @@ export default function RestaurantMap({ layouts, selectedDate, selectedTime, set
 
     // Rich colors matching the provided sketch
     const COLORS = {
-        available: '#d97706', // Brownish Orange (Table color)
-        availableStroke: '#92400e',
+        available: '#EAE3D2', // Light cream/beige (Table color)
+        availableStroke: '#C2B8A3',
         reserved: '#ef4444',
         reservedStroke: '#991b1b',
         blocked: '#4b5563',
         blockedStroke: '#1f2937',
-        text: '#ffffff',
-        furniture: '#1e293b', // Dark Slate for chairs/sofas
-        wall: '#0f172a',
+        text: '#1A2238', // Dark text for light tables
+        furniture: '#333533', // Dark charcoal/slate
+        wall: '#D4A373', // Light wood/tan
         window: '#bae6fd',
-        plant: '#4ade80',
-        floor: '#78350f', // Dark wood floor
-        tile: '#fef3c7'   // Light tile floor
+        plant: '#558B2F', // Natural Green
+        floor: '#1A2238', // Dark navy floor from image
+        tile: '#1A2238'
     };
 
     // Calculate map bounds to auto-set stage size or scrolling
