@@ -132,14 +132,18 @@ svg {
   border-radius: 12px;
 }
 
-@keyframes shimmer {
-  0% {
-    background-position: 200% 0;
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
   }
 
-  100% {
-    background-position: -200% 0;
+  to {
+    transform: rotate(360deg);
   }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
 }
 
 /* Lock scroll when reservation flow is active */

@@ -172,42 +172,45 @@ export default async function RootLayout({ children }) {
                 <Footer config={uiConfig} />
             </div>
             
-            {/* Debug Footer */}
-            {organization && (
-              <div style={{
-                position: 'fixed',
-                bottom: 0,
-                left: 0,
-                right: 0,
-                background: 'rgba(0,0,0,0.8)',
-                color: '#00ff00',
-                fontSize: '10px',
-                padding: '2px 8px',
-                textAlign: 'center',
-                zIndex: 99999,
-                pointerEvents: 'none',
-                fontFamily: 'monospace'
-              }}>
-                Tenant: {organization.name} | Slug: {organization.slug} | ID: {organization.id.slice(0, 8)}
-              </div>
-            )}
-            {!organization && (
-              <div style={{
-                position: 'fixed',
-                bottom: 0,
-                left: 0,
-                right: 0,
-                background: 'rgba(255,0,0,0.8)',
-                color: 'white',
-                fontSize: '10px',
-                padding: '2px 8px',
-                textAlign: 'center',
-                zIndex: 99999,
-                pointerEvents: 'none',
-                fontFamily: 'monospace'
-              }}>
-                Tabblify Landing Mode
-              </div>
+            {/* Debug Footer - Only visible in development */}
+            {process.env.NODE_ENV === 'development' && (
+              <>
+                {organization ? (
+                  <div style={{
+                    position: 'fixed',
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    background: 'rgba(0,0,0,0.8)',
+                    color: '#00ff00',
+                    fontSize: '10px',
+                    padding: '2px 8px',
+                    textAlign: 'center',
+                    zIndex: 99999,
+                    pointerEvents: 'none',
+                    fontFamily: 'monospace'
+                  }}>
+                    Tenant: {organization.name} | Slug: {organization.slug} | ID: {organization.id.slice(0, 8)}
+                  </div>
+                ) : (
+                  <div style={{
+                    position: 'fixed',
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    background: 'rgba(255,0,0,0.8)',
+                    color: 'white',
+                    fontSize: '10px',
+                    padding: '2px 8px',
+                    textAlign: 'center',
+                    zIndex: 99999,
+                    pointerEvents: 'none',
+                    fontFamily: 'monospace'
+                  }}>
+                    Tabblify Landing Mode
+                  </div>
+                )}
+              </>
             )}
         </Providers>
       </body>
