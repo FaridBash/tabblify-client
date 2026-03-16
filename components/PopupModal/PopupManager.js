@@ -17,19 +17,18 @@ export default function PopupManager() {
     if (!uiConfig) return null;
 
     const isHome = pathname === '/';
-    // Matches /t/[any-table-id] but NOT /t/[any-table-id]/menu/...
-    // Actually, usually users call the /t/[t] screen as "menu screen"
-    const isMenu = pathname.startsWith('/t/') && !pathname.includes('/menu/');
+    const isMenusPage = pathname === '/menus';
+    const isTableMenu = pathname.startsWith('/t/') && !pathname.includes('/menu/');
 
     return (
         <>
-            {isHome && (
+            {(isHome || isMenusPage) && (
                 <PopupModal
                     config={uiConfig}
                     type="main"
                 />
             )}
-            {isMenu && (
+            {(isMenusPage || isTableMenu) && (
                 <PopupModal
                     config={uiConfig}
                     type="menu"
