@@ -13,8 +13,10 @@ const KonvaMap = dynamic(() => import('./KonvaMap'), {
     loading: () => <div className={styles.loading}>Initializing Floor Map...</div>
 });
 
-export default function RestaurantMap({ layout, selectedDate, selectedTime, settings, selectedTable, onTableSelect, editingResId }) {
+export default function RestaurantMap({ layouts, selectedDate, selectedTime, settings, selectedTable, onTableSelect, editingResId }) {
     const { t, language } = useLanguage();
+    const [currentLayoutIndex, setCurrentLayoutIndex] = useState(0);
+    const layout = useMemo(() => layouts?.[currentLayoutIndex], [layouts, currentLayoutIndex]);
     const [activeTableIds, setActiveTableIds] = useState(null);
     const [reservedTableIds, setReservedTableIds] = useState(new Set());
     const [blockedTableIds, setBlockedTableIds] = useState(new Set());
@@ -30,6 +32,19 @@ export default function RestaurantMap({ layout, selectedDate, selectedTime, sett
     const [nextResInfo, setNextResInfo] = useState(null);
     const [showInfoModal, setShowInfoModal] = useState(false);
     const containerRef = useRef(null);
+
+    // Auto-select floor when table is pre-selected (e.g. editing)
+    useEffect(() => {
+        if (selectedTable && layouts) {
+            const floorIdx = layouts.findIndex(l => {
+                const items = l.items || l.layout?.items || l.grid_data?.items || [];
+                return items.find(item => (item.tableId || item.table_id) === selectedTable.id);
+            });
+            if (floorIdx !== -1 && floorIdx !== currentLayoutIndex) {
+                setCurrentLayoutIndex(floorIdx);
+            }
+        }
+    }, [selectedTable, layouts]);
 
     // Fetch active tables and features
     useEffect(() => {
@@ -298,6 +313,21 @@ export default function RestaurantMap({ layout, selectedDate, selectedTime, sett
                     </button>
                 </div>
             </div>
+
+            {/* Floor Selector - Only show if more than 1 layout */}
+            {layouts && layouts.length > 1 && (
+                <div className={styles.floorSelector}>
+                    {layouts.map((l, idx) => (
+                        <button
+                            key={l.id}
+                            className={`${styles.floorBtn} ${currentLayoutIndex === idx ? styles.activeFloor : ''}`}
+                            onClick={() => setCurrentLayoutIndex(idx)}
+                        >
+                            {t(l.name, l.name_ar || l.name)}
+                        </button>
+                    ))}
+                </div>
+            )}
 
             <div
                 className={styles.mapContainer}

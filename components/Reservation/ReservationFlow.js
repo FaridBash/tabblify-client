@@ -16,7 +16,7 @@ import styles from './ReservationFlow.module.css';
 const STEPS = { DATE: 0, TIME: 1, MAP: 2, FORM: 3, CONFIRM: 4 };
 
 export default function ReservationFlow({ initialData }) {
-    const { layout, settings, hours, closures } = initialData;
+    const { layouts, settings, hours, closures } = initialData;
     const router = useRouter();
     const searchParams = useSearchParams();
     const { t, language, setLanguage } = useLanguage();
@@ -238,7 +238,7 @@ export default function ReservationFlow({ initialData }) {
             )}
 
             {/* Warning for Missing Data */}
-            {(!layout || !settings || !hours || hours.length === 0) && step < STEPS.CONFIRM && (
+            {(!layouts || layouts.length === 0 || !settings || !hours || hours.length === 0) && step < STEPS.CONFIRM && (
                 <div style={{
                     margin: '20px',
                     padding: '20px',
@@ -316,7 +316,7 @@ export default function ReservationFlow({ initialData }) {
                         {step === STEPS.MAP && (
                             <>
                                 <RestaurantMap
-                                    layout={layout}
+                                    layouts={layouts}
                                     selectedDate={selectedDate}
                                     selectedTime={selectedTime}
                                     settings={settings}
