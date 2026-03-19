@@ -36,16 +36,7 @@ const PublicMenuList = ({ initialMenus }) => {
 
     return (
         <div className={styles.wrapper}>
-            <motion.div 
-                className={styles.heroSection}
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8 }}
-            >
-                <div className={styles.iconCircle}>
-                    <UtensilsCrossed size={48} className={styles.heroIcon} />
-                </div>
-            </motion.div>
+            {/* Hero Section removed as per user request */}
 
             <motion.div
                 className={styles.list}

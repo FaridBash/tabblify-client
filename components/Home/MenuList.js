@@ -33,22 +33,13 @@ const MenuList = ({ initialMenus }) => {
     const getMenuHref = (menu) => {
         const typeParam = menu.menu_type?.toLowerCase() === 'pdf' ? '?type=pdf' : '';
         return tableData?.table_hash 
-            ? `/t/${tableData.table_hash}/menu/${menu.id}${typeParam}` 
+            ? `${basePath}/t/${tableData.table_hash}/menu/${menu.id}${typeParam}` 
             : `${basePath}/menus/${menu.id}${typeParam}`;
     };
 
     return (
         <div className={styles.container}>
-            <motion.div 
-                className={styles.heroSection}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8 }}
-            >
-                <div className={styles.iconCircle}>
-                    <UtensilsCrossed size={48} className={styles.heroIcon} />
-                </div>
-            </motion.div>
+            {/* Hero Section removed as per user request */}
 
             <motion.div
                 className={styles.list}
