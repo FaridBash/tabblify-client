@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import HTMLPageFlip from 'react-pageflip';
 import { Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 import styles from './PDFBook.module.css';
 
 // Set up the worker for react-pdf
@@ -22,6 +23,7 @@ const PageContainer = React.forwardRef((props, ref) => {
 PageContainer.displayName = 'PageContainer';
 
 const PDFBook = ({ pdfUrl }) => {
+    const { t } = useLanguage();
     const [numPages, setNumPages] = useState(null);
     const [currentPage, setCurrentPage] = useState(0);
     const [dimensions, setDimensions] = useState({ width: 300, height: 400 });
@@ -85,7 +87,7 @@ const PDFBook = ({ pdfUrl }) => {
                         loading={
                             <div className={styles.loading}>
                                 <Loader2 className={styles.spinner} size={40} />
-                                <p>Preparing Book...</p>
+                                <p>{t('Preparing Menu...', 'جاري تحضير القائمة...')}</p>
                             </div>
                         }
                     >
@@ -131,7 +133,7 @@ const PDFBook = ({ pdfUrl }) => {
             </div>
 
             {numPages && (
-                <div className={styles.controls}>
+                <div className={styles.controls} dir="ltr">
                     <button
                         onClick={() => bookRef.current?.pageFlip()?.flipPrev()}
                         className={styles.navButton}

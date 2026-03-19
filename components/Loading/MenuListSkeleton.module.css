@@ -1,0 +1,33 @@
+.container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding-top: 40px;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 90%;
+    max-width: 450px;
+    margin: 0 auto;
+    padding-bottom: 20px;
+}
+
+.itemWrapper {
+    width: 100%;
+}
+
+.skeletonPill {
+    height: 75px;
+    border-radius: 50px;
+    background: rgba(var(--white-rgb), 0.05); /* Very subtle against dark bg */
+    border: 1px solid var(--glass-border);
+}
+
+@media (max-width: 480px) {
+    .skeletonPill {
+        height: 65px;
+    }
+}

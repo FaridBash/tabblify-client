@@ -46,7 +46,7 @@ const Footer = ({ config }) => {
         <footer className={styles.footer}>
             <div className={styles.tablePill} style={{ visibility: tableNumber ? 'visible' : 'hidden' }}>
                 <MapPin size={14} className={styles.pinIcon} />
-                <span>Table {tableNumber || '??'}</span>
+                <span>{t('Table', 'طاولة')} {tableNumber || '??'}</span>
             </div>
 
             {finalBottomText && (

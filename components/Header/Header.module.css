@@ -55,7 +55,7 @@
 
 [dir="rtl"] .backButton {
     left: auto;
-    right: 0;
+    right: 15px;
 }
 
 .backButton:hover {

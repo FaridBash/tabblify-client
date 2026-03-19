@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { Loader2 } from 'lucide-react';
 import { useUI } from '@/context/UIContext';
+import MenuListSkeleton from '@/components/Loading/MenuListSkeleton';
 
 export default function QRRedirectPage() {
     const router = useRouter();
@@ -110,9 +111,8 @@ export default function QRRedirectPage() {
     }
 
     return (
-        <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', background: 'var(--background)' }}>
-            <Loader2 className="animate-spin" size={48} color="var(--primary)" style={{ animation: 'spin 1s linear infinite' }} />
-            <p style={{ color: 'var(--primary)', marginTop: '20px', fontWeight: '600' }}>Loading Table...</p>
+        <div style={{ minHeight: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <MenuListSkeleton />
         </div>
     );
 }

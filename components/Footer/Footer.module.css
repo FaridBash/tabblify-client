@@ -38,6 +38,11 @@
     margin-left: 10px;
 }
 
+[dir="rtl"] .tablePill {
+    margin-left: 0;
+    margin-right: 10px;
+}
+
 .bottomLine {
     position: absolute;
     left: 50%;

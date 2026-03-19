@@ -3,12 +3,31 @@
 import React from 'react';
 import { Loader2 } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
+import { useLanguage } from '@/context/LanguageContext';
+import { Suspense } from 'react';
 
-export default function Loading() {
+function LoadingContent() {
     const searchParams = useSearchParams();
+    const { t } = useLanguage();
     const type = searchParams.get('type');
 
-    if (type === 'pdf') return null;
+    if (type === 'pdf') {
+        return (
+            <div style={{ 
+                height: '70dvh', 
+                display: 'flex', 
+                flexDirection: 'column', 
+                justifyContent: 'center', 
+                alignItems: 'center',
+                width: '100%' 
+            }}>
+                <Loader2 className="animate-spin" size={48} color="var(--primary)" style={{ animation: 'spin 1s linear infinite' }} />
+                <p style={{ color: 'var(--primary)', marginTop: '20px', fontWeight: '600' }}>
+                    {t('Preparing Menu...', 'جاري تحضير القائمة...')}
+                </p>
+            </div>
+        );
+    }
 
     return (
         <div style={{ padding: '20px', maxWidth: '900px', margin: '0 auto', width: '100vw' }}>
@@ -35,5 +54,13 @@ export default function Loading() {
                 ))}
             </div>
         </div>
+    );
+}
+
+export default function Loading() {
+    return (
+        <Suspense fallback={null}>
+            <LoadingContent />
+        </Suspense>
     );
 }
