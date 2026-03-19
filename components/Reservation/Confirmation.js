@@ -3,6 +3,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
+import { useUI } from '@/context/UIContext';
 import { CheckCircle, Clock, Calendar, Users, MapPin, Home, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 import styles from './Confirmation.module.css';
@@ -10,6 +11,8 @@ import styles from './Confirmation.module.css';
 export default function Confirmation({ reservation, isEditing }) {
     const { t } = useLanguage();
     const router = useRouter();
+    const { organization } = useUI();
+    const basePath = organization?.slug ? `/${organization.slug}` : '';
 
     if (!reservation) return null;
 
@@ -84,12 +87,12 @@ export default function Confirmation({ reservation, isEditing }) {
 
                 <div style={{ display: 'flex', gap: 10, width: '100%', flexDirection: 'column', alignItems: 'center' }}>
                     {isEditing && (
-                        <button className={styles.homeBtn} onClick={() => router.push('/my-reservations')}>
+                        <button className={styles.homeBtn} onClick={() => router.push(`${basePath}/my-reservations`)}>
                             <ArrowLeft size={18} />
                             {t('Back to My Reservations', 'العودة لحجوزاتي')}
                         </button>
                     )}
-                    <button className={styles.homeBtn} onClick={() => router.push('/')}>
+                    <button className={styles.homeBtn} onClick={() => router.push(`${basePath}/`)}>
                         <Home size={18} />
                         {t('Back to Home', 'العودة للرئيسية')}
                     </button>

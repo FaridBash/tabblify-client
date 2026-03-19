@@ -77,7 +77,8 @@ function TableParamsHandler() {
                 const identifier = savedTable.table_hash;
                 if (identifier && !pathname.startsWith(`/t/${identifier}`)) {
                     // Redirect to the table directory if not already there
-                    router.replace(`/t/${identifier}${pathname === '/' ? '' : pathname}`);
+                    const basePath = organization?.slug ? `/${organization.slug}` : '';
+                    router.replace(`${basePath}/t/${identifier}${pathname === '/' ? '' : pathname}`);
                 }
             } catch (e) {
                 localStorage.removeItem('restaurant_table_info');

@@ -95,7 +95,7 @@ export default function NotFound() {
                 transition={{ delay: 0.4 }}
             >
                 <a 
-                    href="http://localhost:3002"
+                    href="/"
                     style={{
                         display: 'flex',
                         alignItems: 'center',

@@ -11,7 +11,7 @@
 .content {
     width: 100%;
     max-width: 600px;
-    padding: 20px;
+    padding: 10px 20px 30px 20px;
     display: flex;
     flex-direction: column;
     gap: 14px;
@@ -19,6 +19,131 @@
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
+}
+
+/* ── Search Bar ──────────────────────────────────────────── */
+.searchSection {
+    background: rgba(var(--white-rgb), 0.03);
+    border: 1px solid rgba(var(--white-rgb), 0.08);
+    border-radius: 20px;
+    padding: 14px;
+    margin-bottom: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.searchLabel {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--primary);
+    opacity: 0.8;
+    margin-left: 4px;
+}
+
+.searchBox {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.searchInput {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(var(--white-rgb), 0.1);
+    border-radius: 12px;
+    padding: 12px 16px;
+    color: var(--foreground);
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.searchInput:focus {
+    border-color: var(--primary);
+    background: rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.1);
+}
+
+.searchBtn {
+    background: var(--primary);
+    color: var(--secondary-dark);
+    border: none;
+    border-radius: 12px;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.searchBtn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(var(--primary-rgb), 0.3);
+}
+
+.searchBtn:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.clearBtn {
+    position: absolute;
+    right: 58px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: var(--foreground);
+    opacity: 0.3;
+    padding: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.clearBtn:hover {
+    opacity: 0.8;
+    color: var(--error);
+}
+
+.searchHint {
+    font-size: 0.7rem;
+    color: var(--foreground);
+    opacity: 0.3;
+    margin-left: 4px;
+    margin-top: -4px;
+}
+
+.searchError {
+    color: #ef4444;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-top: 4px;
+    margin-left: 4px;
+    animation: fadeIn 0.3s ease;
+}
+
+.smallSpinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    border-top-color: var(--secondary-dark);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 /* ── Empty State ─────────────────────────────────────────── */

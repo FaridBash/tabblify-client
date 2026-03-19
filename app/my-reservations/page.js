@@ -8,7 +8,7 @@ import { useUI } from '@/context/UIContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Calendar, Clock, MapPin,
-    Users, X, Pencil, Trash2, CalendarOff, Plus, AlertCircle
+    Users, X, Pencil, Trash2, CalendarOff, Plus, AlertCircle, Search, ArrowRight
 } from 'lucide-react';
 import styles from './page.module.css';
 
@@ -16,12 +16,15 @@ export default function MyReservationsPage() {
     const router = useRouter();
     const { t, language } = useLanguage();
     const { setHeaderTitle, organization } = useUI();
+    const basePath = organization?.slug ? `/${organization.slug}` : '';
 
     const [reservations, setReservations] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedRes, setSelectedRes] = useState(null);
     const [cancelling, setCancelling] = useState(false);
     const [errorMsg, setErrorMsg] = useState(null);
+    const [emailInput, setEmailInput] = useState('');
+    const [noResultsFound, setNoResultsFound] = useState(false);
 
     // Set the header title via the existing app Header
     useEffect(() => {
@@ -31,16 +34,19 @@ export default function MyReservationsPage() {
 
     useEffect(() => {
         if (organization && !organization.features?.includes('reservations')) {
-            router.push('/');
+            router.push(`${basePath}/`);
         }
-    }, [organization, router]);
+    }, [organization, router, basePath]);
 
-    const fetchReservations = useCallback(async () => {
+    const fetchReservations = useCallback(async (emailOverride = null) => {
         if (!organization) return;
 
-        const email = localStorage.getItem('restaurant_customer_email');
+        // On initial load, try localStorage. If user searched, use the override.
+        const storedEmail = localStorage.getItem('restaurant_customer_email');
+        const email = emailOverride || storedEmail;
         const phone = localStorage.getItem('restaurant_customer_phone');
 
+        // Only search if we have a target
         if (!email && !phone) {
             setReservations([]);
             setLoading(false);
@@ -48,12 +54,16 @@ export default function MyReservationsPage() {
         }
 
         try {
+            setLoading(true);
             setErrorMsg(null);
+            setNoResultsFound(false);
 
-            // Step 1: Fetch reservations only for this organization
+            const today = new Date().toISOString().split('T')[0];
+
             let query = supabase.from('reservations')
                 .select('*')
-                .eq('organization_id', organization.id);
+                .eq('organization_id', organization.id)
+                .gte('reservation_date', today);
 
             if (email && phone) {
                 query = query.or(`customer_email.eq.${email},customer_phone.eq.${phone}`);
@@ -63,16 +73,23 @@ export default function MyReservationsPage() {
                 query = query.eq('customer_phone', phone);
             }
 
-            const { data: resData, error: resError } = await query.order('reservation_date', { ascending: false });
+            const { data: resData, error: resError } = await query.order('reservation_date', { ascending: true });
 
             if (resError) throw resError;
+
+            if (emailOverride && resData && resData.length > 0) {
+                localStorage.setItem('restaurant_customer_email', emailOverride);
+            }
+
             if (!resData || resData.length === 0) {
                 setReservations([]);
+                if (emailOverride) {
+                    setNoResultsFound(true);
+                }
                 setLoading(false);
                 return;
             }
 
-            // Step 2: Fetch table info manually for these reservations
             const tableIds = [...new Set(resData.map(r => r.table_id).filter(Boolean))];
             let tableMap = {};
 
@@ -85,32 +102,38 @@ export default function MyReservationsPage() {
 
                 if (tableData) {
                     tableData.forEach(t => {
-                        tableMap[t.id] = {
-                            ...t,
-                            label: t.table_number?.toString() || ''
-                        };
+                        tableMap[t.id] = { ...t, label: t.table_number?.toString() || '' };
                     });
                 }
             }
 
-            // Merge table data into reservations response
-            const merged = resData.map(r => ({
-                ...r,
-                tables: tableMap[r.table_id] || null
-            }));
-
+            const merged = resData.map(r => ({ ...r, tables: tableMap[r.table_id] || null }));
             setReservations(merged);
         } catch (err) {
-            console.error('Detailed Reservoir Fetch Error:', JSON.stringify(err, null, 2) || err);
-            setErrorMsg(t('Unable to fetch reservations. Please try again later.', 'فشل في جلب الحجوزات. يرجى المحاولة لاحقاً.'));
+            console.error('Fetch Error:', err);
+            setErrorMsg(t('Unable to fetch reservations.', 'فشل في جلب الحجوزات.'));
             setReservations([]);
         } finally {
             setLoading(false);
         }
-    }, [t, organization]);
+    }, [t, organization]); // Removed emailInput from dependencies
+
+    const handleSearch = (e) => {
+        e.preventDefault();
+        const trimEmail = emailInput.trim();
+        if (!trimEmail) return;
+        fetchReservations(trimEmail);
+    };
+
+    const clearSearch = () => {
+        setEmailInput('');
+        setNoResultsFound(false);
+        localStorage.removeItem('restaurant_customer_email');
+        setReservations([]);
+    };
 
     useEffect(() => {
-        fetchReservations();
+        fetchReservations(); // Initial load from localStorage
     }, [fetchReservations]);
 
     const handleCancel = async (id) => {
@@ -135,7 +158,7 @@ export default function MyReservationsPage() {
 
     const handleEdit = (res) => {
         sessionStorage.setItem('editing_reservation', JSON.stringify(res));
-        router.push('/reserve?edit=' + res.id);
+        router.push(`${basePath}/reserve?edit=${res.id}`);
     };
 
     const formatDate = (dateStr) => {
@@ -181,6 +204,40 @@ export default function MyReservationsPage() {
 
             {/* Content Area */}
             <div className={styles.content}>
+                {/* Search Section */}
+                <form className={styles.searchSection} onSubmit={handleSearch}>
+                    <label className={styles.searchLabel}>
+                        {t('Find by Email', 'البحث بالبريد الإلكتروني')}
+                    </label>
+                    <div className={styles.searchBox}>
+                        <Search className={styles.searchIcon} size={18} style={{ position: 'absolute', left: '12px', opacity: 0.4 }} />
+                        <input
+                            type="email"
+                            className={styles.searchInput}
+                            style={{ paddingLeft: '40px' }}
+                            placeholder={t('Enter your email address', 'أدخل بريدك الإلكتروني')}
+                            value={emailInput}
+                            onChange={(e) => {
+                                setEmailInput(e.target.value);
+                                if (noResultsFound) setNoResultsFound(false);
+                            }}
+                        />
+                        {emailInput && (
+                            <button type="button" className={styles.clearBtn} onClick={clearSearch}>
+                                <X size={16} />
+                            </button>
+                        )}
+                        <button type="submit" className={styles.searchBtn} disabled={!emailInput.trim() || loading}>
+                            {loading ? <div className={styles.smallSpinner} /> : <ArrowRight size={20} />}
+                        </button>
+                    </div>
+                    {noResultsFound && (
+                        <p className={styles.searchError}>
+                            {t('No future reservations found for this email.', 'لم يتم العثور على حجوزات مستقبلية لهذا البريد.')}
+                        </p>
+                    )}
+                </form>
+
                 {loading ? (
                     <div className={styles.loadingState}>
                         <div className={styles.spinner} />
@@ -192,7 +249,7 @@ export default function MyReservationsPage() {
                     <div className={styles.errorState}>
                         <AlertCircle size={48} color="#ef4444" opacity={0.5} />
                         <p>{errorMsg}</p>
-                        <button className={styles.retryBtn} onClick={fetchReservations}>
+                        <button className={styles.retryBtn} onClick={() => fetchReservations()}>
                             {t('Try Again', 'إعادة المحاولة')}
                         </button>
                     </div>
@@ -214,7 +271,7 @@ export default function MyReservationsPage() {
                         </p>
                         <button
                             className={styles.emptyButton}
-                            onClick={() => router.push('/reserve')}
+                            onClick={() => router.push(`${basePath}/reserve`)}
                         >
                             <Plus size={18} />
                             {t('Reserve a Table', 'احجز طاولة')}

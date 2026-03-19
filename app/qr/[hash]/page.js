@@ -22,6 +22,8 @@ export default function QRRedirectPage() {
         // Wait for organization to be available from context
         if (!organization) return;
 
+        const basePath = organization.slug ? `/${organization.slug}` : '';
+
         const processQRScan = async () => {
             try {
                 // 1. Fetch table details based on the hash and organization
@@ -35,7 +37,7 @@ export default function QRRedirectPage() {
                 if (tableError || !tableData) {
                     console.error('Invalid Table QR Hash for this organization:', tableError);
                     setInvalidQR(true);
-                    setTimeout(() => router.replace('/'), 3000);
+                    setTimeout(() => router.replace(basePath || '/'), 3000);
                     return;
                 }
 
@@ -83,11 +85,11 @@ export default function QRRedirectPage() {
                 }
 
                 // Quick redirect
-                router.replace(`/t/${hash}`);
+                router.replace(`${basePath}/t/${hash}`);
 
             } catch (err) {
                 console.error('QR Scan Processing Error:', err);
-                router.replace(`/t/${hash}`);
+                router.replace(`${basePath}/t/${hash}`);
             }
         };
 

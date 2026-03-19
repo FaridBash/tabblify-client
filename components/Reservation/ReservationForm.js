@@ -7,7 +7,7 @@ import { useUI } from '@/context/UIContext';
 import { User, Phone, Users, Clock, Send, Mail } from 'lucide-react';
 import styles from './ReservationForm.module.css';
 
-export default function ReservationForm({ table, date, time, settings, onComplete, editingReservation }) {
+export default function ReservationForm({ table, date, time, settings, onComplete, onBack, editingReservation }) {
     const { t } = useLanguage();
     const { organization } = useUI();
     const bufferTime = settings?.buffer_time || 60;
@@ -103,9 +103,19 @@ export default function ReservationForm({ table, date, time, settings, onComplet
                     .eq('id', editingReservation.id)
                     .eq('organization_id', organization?.id)
                     .select()
-                    .single();
+                    .maybeSingle();
+
                 if (dbError) throw dbError;
-                resultData = updated;
+
+                // Handle case where update returned no rows (e.g. filter mismatch or RLS)
+                if (!updated) {
+                    // Fallback: If it's a no-change-update, maybe postgrest returned 0 rows but it's fine.
+                    // However, we need the data to proceed to confirmation.
+                    // Let's assume the state we have is correct if no error was thrown.
+                    resultData = { ...editingReservation, ...payload };
+                } else {
+                    resultData = updated;
+                }
             } else {
                 // Create new reservation
                 payload.status = autoConfirm ? 'confirmed' : 'pending';

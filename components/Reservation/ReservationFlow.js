@@ -117,21 +117,23 @@ export default function ReservationFlow({ initialData }) {
         setStep(STEPS.CONFIRM);
     };
 
+    const basePath = uiConfig?.organization?.slug ? `/${uiConfig.organization.slug}` : '';
+
     const handleBack = () => {
         if (step > 0) {
             setStep(step - 1);
         } else if (isEditing) {
             // Cancel editing — go back to my reservations
             sessionStorage.removeItem('editing_reservation');
-            router.push('/my-reservations');
+            router.push(`${basePath}/my-reservations`);
         } else {
-            router.push('/');
+            router.push(`${basePath}/`);
         }
     };
 
     const handleCancelEdit = () => {
         sessionStorage.removeItem('editing_reservation');
-        router.push('/my-reservations');
+        router.push(`${basePath}/my-reservations`);
     };
 
     const BackIcon = isRTL ? ChevronRight : ChevronLeft;
