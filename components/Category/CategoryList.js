@@ -23,10 +23,9 @@ const CategoryList = ({ initialCategories, menu, basePath }) => {
 
     const getCategoryHref = (categoryId) => {
         if (basePath) return `${basePath}/${categoryId}`;
-        const orgPrefix = organization?.slug ? `/${organization.slug}` : '';
         return tableData?.table_hash 
-            ? `${orgPrefix}/t/${tableData.table_hash}/menu/${menu.id}/${categoryId}` 
-            : `${orgPrefix}/menu/${menu.id}/${categoryId}`;
+            ? `/t/${tableData.table_hash}/menu/${menu.id}/${categoryId}` 
+            : `/menu/${menu.id}/${categoryId}`;
     };
 
     const container = {

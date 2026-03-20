@@ -9,10 +9,7 @@ export default function PopupManager() {
     const rawPathname = usePathname();
     const { uiConfig, organization } = useUI();
 
-    let pathname = rawPathname;
-    if (organization?.slug && pathname?.startsWith(`/${organization.slug}`)) {
-        pathname = pathname.slice(organization.slug.length + 1) || '/';
-    }
+    const pathname = rawPathname;
 
     if (!uiConfig) return null;
 

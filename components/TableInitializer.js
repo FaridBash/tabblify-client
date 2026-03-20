@@ -11,10 +11,7 @@ function TableParamsHandler() {
     const params = useParams();
     const { setTableNumber, setTableData, setTableError, organization } = useUI();
 
-    let pathname = rawPathname;
-    if (organization?.slug && pathname?.startsWith(`/${organization.slug}`)) {
-        pathname = pathname.slice(organization.slug.length + 1) || '/';
-    }
+    const pathname = rawPathname;
 
     useEffect(() => {
         if (!organization) return;
@@ -77,8 +74,7 @@ function TableParamsHandler() {
                 const identifier = savedTable.table_hash;
                 if (identifier && !pathname.startsWith(`/t/${identifier}`)) {
                     // Redirect to the table directory if not already there
-                    const basePath = organization?.slug ? `/${organization.slug}` : '';
-                    router.replace(`${basePath}/t/${identifier}${pathname === '/' ? '' : pathname}`);
+                    router.replace(`/t/${identifier}${pathname === '/' ? '' : pathname}`);
                 }
             } catch (e) {
                 localStorage.removeItem('restaurant_table_info');

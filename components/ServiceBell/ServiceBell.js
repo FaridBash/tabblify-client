@@ -15,10 +15,7 @@ const ServiceBell = () => {
     const [status, setStatus] = useState('idle'); // idle, sending, sent, in-progress, completed
     const rawPathname = usePathname();
 
-    let pathname = rawPathname;
-    if (organization?.slug && pathname?.startsWith(`/${organization.slug}`)) {
-        pathname = pathname.slice(organization.slug.length + 1) || '/';
-    }
+    const pathname = rawPathname;
 
     // Real-time listener
     useEffect(() => {

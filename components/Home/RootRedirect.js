@@ -14,7 +14,7 @@ export default function RootRedirect() {
 
     const hasReservations = organization?.features?.includes('reservations');
     const hasEMenu = organization?.features?.includes('emenu');
-    const basePath = organization?.slug ? `/${organization.slug}` : '';
+
 
     // If no organization is identified (Root Landing Mode), show a premium generic landing page
     if (!organization) {
@@ -159,7 +159,7 @@ export default function RootRedirect() {
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.1 }}
                     className={styles.reserveButton}
-                    onClick={() => router.push(`${basePath}/reserve`)}
+                    onClick={() => router.push('/reserve')}
                 >
                     <Calendar className={styles.reserveIcon} size={28} />
                     <span className={styles.reserveTitle}>
@@ -174,7 +174,7 @@ export default function RootRedirect() {
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.2 }}
                     className={styles.menuButton}
-                    onClick={() => router.push(`${basePath}/menus`)}
+                    onClick={() => router.push('/menus')}
                 >
                     <UtensilsCrossed className={styles.menuIcon} size={28} />
                     <span className={styles.menuTitle}>
@@ -189,7 +189,7 @@ export default function RootRedirect() {
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.3 }}
                     className={styles.myResButton}
-                    onClick={() => router.push(`${basePath}/my-reservations`)}
+                    onClick={() => router.push('/my-reservations')}
                 >
                     <ClipboardList className={styles.myResIcon} size={28} />
                     <span className={styles.myResTitle}>

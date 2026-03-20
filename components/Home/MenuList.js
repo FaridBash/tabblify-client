@@ -13,7 +13,7 @@ const MenuList = ({ initialMenus }) => {
     const ui = useUI();
     const tableData = ui?.tableData;
     const organization = ui?.organization;
-    const basePath = organization?.slug ? `/${organization.slug}` : '';
+
 
     const container = {
         hidden: { opacity: 0 },
@@ -33,8 +33,8 @@ const MenuList = ({ initialMenus }) => {
     const getMenuHref = (menu) => {
         const typeParam = menu.menu_type?.toLowerCase() === 'pdf' ? '?type=pdf' : '';
         return tableData?.table_hash 
-            ? `${basePath}/t/${tableData.table_hash}/menu/${menu.id}${typeParam}` 
-            : `${basePath}/menus/${menu.id}${typeParam}`;
+            ? `/t/${tableData.table_hash}/menu/${menu.id}${typeParam}` 
+            : `/menus/${menu.id}${typeParam}`;
     };
 
     return (

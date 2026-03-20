@@ -12,10 +12,7 @@ const Footer = ({ config }) => {
     const { tableNumber, organization } = useUI();
     const rawPathname = usePathname();
 
-    let pathname = rawPathname;
-    if (organization?.slug && pathname?.startsWith(`/${organization.slug}`)) {
-        pathname = pathname.slice(organization.slug.length + 1) || '/';
-    }
+    const pathname = rawPathname;
 
     const isMainScreen = pathname === '/';
 

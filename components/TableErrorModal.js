@@ -13,10 +13,7 @@ export default function TableErrorModal() {
     const router = useRouter();
     const rawPathname = usePathname();
 
-    let pathname = rawPathname;
-    if (organization?.slug && pathname?.startsWith(`/${organization.slug}`)) {
-        pathname = pathname.slice(organization.slug.length + 1) || '/';
-    }
+    const pathname = rawPathname;
 
     // Don't show on public routes that don't require a table session
     if (!tableError || pathname?.startsWith('/menus') || pathname?.startsWith('/my-reservations') || pathname === '/') return null;
@@ -97,8 +94,7 @@ export default function TableErrorModal() {
 
                         <button
                             onClick={() => {
-                                const orgPrefix = organization?.slug ? `/${organization.slug}` : '';
-                                window.location.href = orgPrefix || '/';
+                                window.location.href = '/';
                             }}
                             style={{
                                 background: 'var(--primary)',

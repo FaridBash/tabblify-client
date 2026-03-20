@@ -16,7 +16,7 @@ export default function MyReservationsPage() {
     const router = useRouter();
     const { t, language } = useLanguage();
     const { setHeaderTitle, organization } = useUI();
-    const basePath = organization?.slug ? `/${organization.slug}` : '';
+
 
     const [reservations, setReservations] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -34,9 +34,9 @@ export default function MyReservationsPage() {
 
     useEffect(() => {
         if (organization && !organization.features?.includes('reservations')) {
-            router.push(`${basePath}/`);
+            router.push('/');
         }
-    }, [organization, router, basePath]);
+    }, [organization, router]);
 
     const fetchReservations = useCallback(async (emailOverride = null) => {
         if (!organization) return;
@@ -158,7 +158,7 @@ export default function MyReservationsPage() {
 
     const handleEdit = (res) => {
         sessionStorage.setItem('editing_reservation', JSON.stringify(res));
-        router.push(`${basePath}/reserve?edit=${res.id}`);
+        router.push(`/reserve?edit=${res.id}`);
     };
 
     const formatDate = (dateStr) => {
@@ -271,7 +271,7 @@ export default function MyReservationsPage() {
                         </p>
                         <button
                             className={styles.emptyButton}
-                            onClick={() => router.push(`${basePath}/reserve`)}
+                            onClick={() => router.push('/reserve')}
                         >
                             <Plus size={18} />
                             {t('Reserve a Table', 'احجز طاولة')}

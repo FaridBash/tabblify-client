@@ -15,10 +15,7 @@ const Header = ({ config }) => {
     const rawPathname = usePathname();
     const router = useRouter();
 
-    let pathname = rawPathname;
-    if (organization?.slug && pathname?.startsWith(`/${organization.slug}`)) {
-        pathname = pathname.slice(organization.slug.length + 1) || '/';
-    }
+    const pathname = rawPathname;
 
     const isHome = pathname === '/' || /^\/t\/[^\/]+$/.test(pathname);
     const isGenericLanding = isHome && !organization;

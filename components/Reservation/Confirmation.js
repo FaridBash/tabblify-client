@@ -12,7 +12,7 @@ export default function Confirmation({ reservation, isEditing }) {
     const { t } = useLanguage();
     const router = useRouter();
     const { organization } = useUI();
-    const basePath = organization?.slug ? `/${organization.slug}` : '';
+
 
     if (!reservation) return null;
 
@@ -87,12 +87,12 @@ export default function Confirmation({ reservation, isEditing }) {
 
                 <div style={{ display: 'flex', gap: 10, width: '100%', flexDirection: 'column', alignItems: 'center' }}>
                     {isEditing && (
-                        <button className={styles.homeBtn} onClick={() => router.push(`${basePath}/my-reservations`)}>
+                        <button className={styles.homeBtn} onClick={() => router.push('/my-reservations')}>
                             <ArrowLeft size={18} />
                             {t('Back to My Reservations', 'العودة لحجوزاتي')}
                         </button>
                     )}
-                    <button className={styles.homeBtn} onClick={() => router.push(`${basePath}/`)}>
+                    <button className={styles.homeBtn} onClick={() => router.push('/')}>
                         <Home size={18} />
                         {t('Back to Home', 'العودة للرئيسية')}
                     </button>
