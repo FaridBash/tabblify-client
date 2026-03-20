@@ -16,6 +16,8 @@ async function getUIConfig(organizationId) {
   if (!organizationId) return null;
 
   try {
+    if (!supabase) return null;
+
     const { data, error } = await supabase
       .from('ui_config')
       .select(`

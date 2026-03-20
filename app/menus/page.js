@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import PublicMenuList from '@/components/Home/PublicMenuList';
+import MenuLanding from '@/components/Home/MenuLanding';
 import styles from './page.module.css';
 import { getOrganization } from '@/lib/org';
 import { redirect } from 'next/navigation';
@@ -64,7 +64,7 @@ export default async function MenusPage() {
 
     return (
         <div className={styles.container}>
-            <PublicMenuList initialMenus={menus} />
+            <MenuLanding initialMenus={menus} />
         </div>
     );
 }

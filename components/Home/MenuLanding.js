@@ -5,19 +5,12 @@ import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import { useUI } from '@/context/UIContext';
 import { motion } from 'framer-motion';
-import { UtensilsCrossed } from 'lucide-react';
-import styles from './PublicMenuList.module.css';
+import styles from './MenuLanding.module.css';
+import OrgBranding from './OrgBranding';
 
-const PublicMenuList = ({ initialMenus }) => {
+const MenuLanding = ({ initialMenus, title, subtitle }) => {
     const { t } = useLanguage();
-    const { uiConfig, setHeaderTitle, organization } = useUI();
-
-
-    React.useEffect(() => {
-        const title = t(uiConfig?.main_menu_button_en, uiConfig?.main_menu_button_ar) || t('View Our Menus', 'عرض قوائمنا');
-        setHeaderTitle(title);
-        // Clear title on unmount if needed, or leave it for the next page to set
-    }, [t, uiConfig, setHeaderTitle]);
+    const { uiConfig, tableData } = useUI();
 
     const container = {
         hidden: { opacity: 0 },
@@ -34,8 +27,16 @@ const PublicMenuList = ({ initialMenus }) => {
         show: { y: 0, opacity: 1 }
     };
 
+    const getMenuHref = (menu) => {
+        const typeParam = menu.menu_type?.toLowerCase() === 'pdf' ? '?type=pdf' : '';
+        return tableData?.table_hash 
+            ? `/t/${tableData.table_hash}/menu/${menu.id}${typeParam}` 
+            : `/menus/${menu.id}${typeParam}`;
+    };
+
     return (
-        <div className={styles.wrapper}>
+        <div className={styles.container}>
+            <OrgBranding uiConfig={uiConfig} title={title} subtitle={subtitle} />
 
             <motion.div
                 className={styles.list}
@@ -45,10 +46,7 @@ const PublicMenuList = ({ initialMenus }) => {
             >
                 {initialMenus.map((menu) => (
                     <motion.div key={menu.id} variants={item} className={styles.itemWrapper}>
-                        <Link 
-                            href={`/menus/${menu.id}${menu.menu_type?.toLowerCase() === 'pdf' ? '?type=pdf' : ''}`} 
-                            className={`${styles.menuPill} glass-card glass-card-hover`}
-                        >
+                        <Link href={getMenuHref(menu)} className={`${styles.menuPill} glass-card glass-card-hover`}>
                             <span className={styles.menuTitle}>
                                 {t(menu.name_en || menu.title_en, menu.name_ar || menu.title_ar)}
                             </span>
@@ -60,4 +58,4 @@ const PublicMenuList = ({ initialMenus }) => {
     );
 };
 
-export default PublicMenuList;
+export default MenuLanding;

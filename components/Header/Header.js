@@ -17,7 +17,7 @@ const Header = ({ config }) => {
 
     const pathname = rawPathname;
 
-    const isHome = pathname === '/' || /^\/t\/[^\/]+$/.test(pathname);
+    const isHome = pathname === '/' || pathname === '/menus' || /^\/t\/[^\/]+$/.test(pathname);
     const isGenericLanding = isHome && !organization;
 
     if (pathname.startsWith('/reserve')) return null;
@@ -32,7 +32,7 @@ const Header = ({ config }) => {
         setIsModalOpen(false);
     };
 
-    if (pathname === '/') {
+    if (isHome) {
         return (
             <div className={`${styles.headerActionsOnly} ${isGenericLanding ? '' : styles.homeHeader}`}>
                 <div className={styles.actions}>

@@ -6,6 +6,7 @@ import { useUI } from '@/context/UIContext';
 import { Calendar, UtensilsCrossed, ClipboardList, ScanQrCode, Sparkles, ShieldCheck, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 import styles from './RootRedirect.module.css';
+import OrgBranding from './OrgBranding';
 
 export default function RootRedirect() {
     const router = useRouter();
@@ -131,27 +132,7 @@ export default function RootRedirect() {
                 ` : ''}
             `}} />
 
-            <motion.div
-                className={styles.logoContainer}
-                initial={{ y: -20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-            >
-                {uiConfig?.main_show_logo !== false && uiConfig?.logo_url && (
-                    <img src={uiConfig.logo_url} alt="Logo" className={styles.logo} />
-                )}
-                <div className={styles.branding}>
-                    {uiConfig?.main_show_title !== false && (
-                        <h1 className={styles.homeTitle}>
-                            {t(uiConfig?.main_title_en, uiConfig?.main_title_ar) || t(uiConfig?.title_en, uiConfig?.title_ar) || 'Welcome'}
-                        </h1>
-                    )}
-                    {uiConfig?.main_show_subtitle !== false && (
-                        <p className={styles.subtitle}>
-                            {t(uiConfig?.main_subtitle_en, uiConfig?.main_subtitle_ar) || t(uiConfig?.subtitle_en, uiConfig?.subtitle_ar) || 'Please scan the table QR code'}
-                        </p>
-                    )}
-                </div>
-            </motion.div>
+            <OrgBranding uiConfig={uiConfig} mode="home" />
 
             {hasReservations && uiConfig?.main_show_button !== false && (
                 <motion.button

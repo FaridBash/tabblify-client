@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import MenuList from '@/components/Home/MenuList';
+import MenuLanding from '@/components/Home/MenuLanding';
 import styles from './page.module.css';
 import { getOrganization } from '@/lib/org';
 import RootRedirect from '@/components/Home/RootRedirect';
@@ -59,7 +59,7 @@ export default async function Home({ params }) {
 
   return (
     <div className={styles.container}>
-      <MenuList initialMenus={menus} />
+      <MenuLanding initialMenus={menus} />
     </div>
   );
 }
