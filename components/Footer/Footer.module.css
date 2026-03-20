@@ -84,21 +84,34 @@
 
 @media (max-width: 480px) {
     .footer {
-        height: 75px;
-        padding: 8px 10px 10px;
+        height: auto;
+        min-height: 75px;
+        padding: 12px 15px;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
     }
 
     .footer::after {
         inset: 8px 10px 10px;
+        border-radius: 40px;
     }
 
     .tablePill {
-        padding: 5px 12px;
+        padding: 6px 14px;
         font-size: 0.8rem;
+        margin: 0;
     }
 
     .bottomLine {
-        font-size: 0.8rem;
+        position: relative;
+        left: auto;
+        top: auto;
+        transform: none;
+        font-size: 0.85rem;
+        width: 100%;
+        text-align: center;
+        order: 2;
     }
 
     .brandPlaceholder {
