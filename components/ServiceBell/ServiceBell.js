@@ -19,7 +19,7 @@ const ServiceBell = () => {
 
     // Real-time listener
     useEffect(() => {
-        if (!tableData?.id || !guestId || !organization) return;
+        if (!tableData?.id || !guestId || !organization || !supabase) return;
 
         // Initial Check: See if there's an active request already for this organization
         const fetchInitialStatus = async () => {
@@ -73,7 +73,9 @@ const ServiceBell = () => {
             .subscribe();
 
         return () => {
-            supabase.removeChannel(channel);
+            if (channel) {
+                supabase.removeChannel(channel);
+            }
         };
     }, [tableData?.id, guestId, organization]);
 
@@ -88,7 +90,7 @@ const ServiceBell = () => {
     }
 
     const handleCallService = async () => {
-        if (!tableData?.id || !guestId || !organization || status !== 'idle') return;
+        if (!tableData?.id || !guestId || !organization || !supabase || status !== 'idle') return;
 
         setStatus('sending');
         try {

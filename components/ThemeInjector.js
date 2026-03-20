@@ -105,6 +105,8 @@ export default function ThemeInjector({ initialTheme }) {
             fetchActiveTheme()
         }
 
+        if (!supabase) return;
+
         const subscription = supabase
             .channel(`theme-changes-${organization.id}`)
             .on(
@@ -130,7 +132,9 @@ export default function ThemeInjector({ initialTheme }) {
             .subscribe()
 
         return () => {
-            subscription.unsubscribe()
+            if (subscription) {
+                subscription.unsubscribe()
+            }
         }
     }, [organization, initialTheme])
 
