@@ -7,7 +7,7 @@ import { redirect } from 'next/navigation';
 export const dynamic = 'force-dynamic';
 
 async function getLinkedMenus(organizationId) {
-    if (!organizationId) return [];
+    if (!organizationId || !supabase) return [];
 
     // Fetch ui_config for THIS organization to get the list of linked menu IDs
     const { data: config, error: configError } = await supabase

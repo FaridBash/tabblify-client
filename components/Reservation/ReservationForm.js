@@ -77,6 +77,11 @@ export default function ReservationForm({ table, date, time, settings, onComplet
             return;
         }
 
+        if (!supabase) {
+            setError(t('System temporarily unavailable. Please try again later.', 'النظام غير متوفر مؤقتاً. يرجى المحاولة لاحقاً.'));
+            return;
+        }
+
         setSubmitting(true);
         let resultData = null;
         try {

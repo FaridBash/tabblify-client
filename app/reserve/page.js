@@ -6,6 +6,11 @@ import { redirect } from 'next/navigation';
 async function getReservationData(organizationId) {
     if (!organizationId) return { layout: null, settings: null, hours: [], closures: [] };
 
+    if (!supabase) {
+        console.error('Supabase client not initialized');
+        return { layouts: [], settings: null, hours: [], closures: [] };
+    }
+
     try {
         const [layoutsRes, settingsRes, hoursRes, closuresRes] = await Promise.all([
             supabase.from('restaurant_layouts').select('*').eq('organization_id', organizationId).eq('is_active', true).order('name', { ascending: true }),

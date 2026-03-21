@@ -26,6 +26,11 @@ export default function QRRedirectPage() {
 
 
         const processQRScan = async () => {
+            if (!supabase) {
+                console.error('Supabase client not initialized');
+                router.replace(`/t/${hash}`);
+                return;
+            }
             try {
                 // 1. Fetch table details based on the hash and organization
                 const { data: tableData, error: tableError } = await supabase

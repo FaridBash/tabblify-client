@@ -53,6 +53,12 @@ export default function MyReservationsPage() {
             return;
         }
 
+        if (!supabase) {
+            setLoading(false);
+            setErrorMsg(t('Service temporarily unavailable', 'الخدمة غير متوفرة حالياً'));
+            return;
+        }
+
         try {
             setLoading(true);
             setErrorMsg(null);
@@ -137,6 +143,7 @@ export default function MyReservationsPage() {
     }, [fetchReservations]);
 
     const handleCancel = async (id) => {
+        if (!supabase) return;
         setCancelling(true);
         try {
             const { error } = await supabase

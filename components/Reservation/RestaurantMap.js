@@ -49,6 +49,8 @@ export default function RestaurantMap({ layouts, selectedDate, selectedTime, set
     // Fetch active tables and features
     useEffect(() => {
         const initData = async () => {
+            if (!supabase) return;
+
             // Fetch active tables
             const { data: tables } = await supabase
                 .from('tables')
@@ -80,6 +82,8 @@ export default function RestaurantMap({ layouts, selectedDate, selectedTime, set
         }
 
         const fetchFilteredTables = async () => {
+            if (!supabase) return;
+
             const { data } = await supabase
                 .from('table_feature_assignments')
                 .select('table_id')
@@ -190,6 +194,8 @@ export default function RestaurantMap({ layouts, selectedDate, selectedTime, set
         if (!selectedDate || !selectedTime) return;
 
         const fetchData = async () => {
+            if (!supabase) return;
+
             setLoading(true);
             const dateStr = selectedDate.toISOString().split('T')[0];
             const [h, m] = selectedTime.split(':').map(Number);
