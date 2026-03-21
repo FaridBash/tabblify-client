@@ -122,8 +122,9 @@ export default function RootRedirect() {
                 .main-content {
                     padding-bottom: 0 !important;
                     display: flex !important;
+                    flex-direction: column !important;
                     align-items: center !important;
-                    justify-content: center !important;
+                    justify-content: flex-start !important;
                 }
                 ${(uiConfig?.main_background_mobile_url || uiConfig?.background_image_mobile_url) ? `
                 .app-background {
