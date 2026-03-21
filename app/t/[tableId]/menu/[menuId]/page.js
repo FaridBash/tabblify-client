@@ -6,6 +6,7 @@ import { getOrganization } from '@/lib/org';
 export const dynamic = 'force-dynamic';
 
 async function getCategories(menuId, organizationId) {
+    if (!supabase) return [];
     const { data, error } = await supabase
         .from('categories')
         .select('*')
@@ -21,6 +22,7 @@ async function getCategories(menuId, organizationId) {
 }
 
 async function getMenu(menuId, organizationId) {
+    if (!supabase) return null;
     const { data, error } = await supabase
         .from('menus')
         .select('*')
@@ -41,6 +43,7 @@ export default async function CategoryPage({ params }) {
     if (!tableHash || !organization) return <div className={styles.container}></div>;
 
     // Validate table exists, is active and belongs to this organization
+    if (!supabase) return <div className={styles.container}></div>;
     const { data: table, error: tableError } = await supabase
         .from('tables')
         .select('id')

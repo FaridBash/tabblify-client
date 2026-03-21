@@ -6,6 +6,7 @@ import { getOrganization } from '@/lib/org';
 export const dynamic = 'force-dynamic';
 
 async function getItems(categoryId, organizationId) {
+    if (!supabase) return [];
     const { data, error } = await supabase
         .from('items')
         .select('*')
@@ -21,6 +22,7 @@ async function getItems(categoryId, organizationId) {
 }
 
 async function getCategory(categoryId, organizationId) {
+    if (!supabase) return null;
     const { data, error } = await supabase
         .from('categories')
         .select('*, menus(*)')

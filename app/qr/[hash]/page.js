@@ -35,10 +35,13 @@ export default function QRRedirectPage() {
                 // 1. Fetch table details based on the hash and organization
                 const { data: tableData, error: tableError } = await supabase
                     .from('tables')
-                    .select('id, table_number')
+                    .select('*')
                     .eq('table_hash', hash)
                     .eq('organization_id', organization.id)
                     .single();
+
+                console.log(`[QR Scan Diagnostic] Organization ID: ${organization.id}, Hash: ${hash}`);
+                console.log(`[QR Scan Diagnostic] Found Table Data:`, tableData);
 
                 if (tableError || !tableData) {
                     console.error('Invalid Table QR Hash for this organization:', tableError);

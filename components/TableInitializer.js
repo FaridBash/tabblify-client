@@ -18,6 +18,11 @@ function TableParamsHandler() {
 
         const fetchTableData = async (identifier) => {
             try {
+                if (!supabase) {
+                    console.warn('[TableInit] Supabase client is null. Skipping fetch.');
+                    return;
+                }
+
                 // Strictly fetch by hash and organization to prevent cross-tenant access
                 const { data, error } = await supabase
                     .from('tables')
@@ -28,11 +33,13 @@ function TableParamsHandler() {
                     .single();
 
                 if (data && !error) {
+                    console.log(`[TableInit Diagnostic] Fetched Table for Hash "${identifier}":`, data);
                     setTableNumber(data.table_number);
                     if (setTableData) setTableData(data);
                     setTableError(false);
                     localStorage.setItem('restaurant_table_info', JSON.stringify(data));
                 } else {
+                    console.error(`[TableInit Diagnostic] Failed to fetch table for Hash "${identifier}", Org ID: ${organization.id}`, error);
                     setTableError(true);
                 }
             } catch (err) {

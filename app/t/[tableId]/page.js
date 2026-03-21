@@ -11,6 +11,10 @@ async function getMenus(tableIdentifier, organizationId) {
   }
 
   // If table identifier provided, first find the table strictly by hash and organization
+  if (!supabase) {
+    console.error('Supabase client not initialized');
+    return [];
+  }
   const { data: tableData, error: tableError } = await supabase
     .from('tables')
     .select('id')
