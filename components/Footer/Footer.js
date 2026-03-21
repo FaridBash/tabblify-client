@@ -41,20 +41,18 @@ const Footer = ({ config }) => {
 
     return (
         <footer className={styles.footer}>
-            <div className={styles.tablePill} style={{ visibility: tableNumber ? 'visible' : 'hidden' }}>
-                <MapPin size={14} className={styles.pinIcon} />
-                <span>{t('Table', 'طاولة')} {tableNumber || '??'}</span>
-            </div>
+            {tableNumber && (
+                <div className={styles.tablePill}>
+                    <MapPin size={14} className={styles.pinIcon} />
+                    <span>{t('Table', 'طاولة')} {tableNumber}</span>
+                </div>
+            )}
 
             {finalBottomText && (
                 <p className={styles.bottomLine}>
                     {finalBottomText}
                 </p>
             )}
-
-            {/* <div className={styles.brandPlaceholder}>
-                <span className={styles.brandN}>N</span>
-            </div> */}
         </footer>
     );
 };
