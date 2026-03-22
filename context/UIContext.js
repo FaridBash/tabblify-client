@@ -11,6 +11,7 @@ export const UIProvider = ({ children, initialConfig, organization }) => {
     const [tableError, setTableError] = useState(false);
     const [guestId, setGuestId] = useState(null);
     const [uiConfig, setUiConfig] = useState(initialConfig);
+    const [footerText, setFooterText] = useState('');
 
     // Initialize/Persist Guest Session
     React.useEffect(() => {
@@ -30,6 +31,7 @@ export const UIProvider = ({ children, initialConfig, organization }) => {
             tableError, setTableError,
             guestId,
             uiConfig, setUiConfig,
+            footerText, setFooterText,
             organization
         }}>
             {children}

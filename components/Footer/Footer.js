@@ -9,7 +9,7 @@ import styles from './Footer.module.css';
 
 const Footer = ({ config }) => {
     const { t } = useLanguage();
-    const { tableNumber, organization } = useUI();
+    const { tableNumber, organization, footerText } = useUI();
     const rawPathname = usePathname();
 
     const pathname = rawPathname;
@@ -18,12 +18,12 @@ const Footer = ({ config }) => {
 
     if (!organization || pathname.startsWith('/reserve')) return null;
 
-    if (isMainScreen && config?.main_show_bottom_line === false) {
+    if (isMainScreen && config?.main_show_bottom_line === false && !footerText) {
         return null;
     }
 
-    let bottomText = null;
-    if (config) {
+    let bottomText = footerText || null;
+    if (!bottomText && config) {
         if (isMainScreen) {
             if (config.main_bottom_line_en || config.main_bottom_line_ar) {
                 bottomText = t(config.main_bottom_line_en, config.main_bottom_line_ar);

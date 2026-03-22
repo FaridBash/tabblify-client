@@ -1,20 +1,17 @@
 import { supabase } from '@/lib/supabase';
 import MenuLanding from '@/components/Home/MenuLanding';
+import TablePopup from '@/components/Home/TablePopup';
 import styles from './page.module.css';
 import { getOrganization } from '@/lib/org';
 import RootRedirect from '@/components/Home/RootRedirect';
 
-async function getMenus(tableIdentifier, organizationId) {
-  // Strict: If no table hash provided or organization not identified, return no menus
-  if (!tableIdentifier || !organizationId) {
-    return [];
+async function getTableData(tableIdentifier, organizationId) {
+  // Strict: If no table hash provided or organization not identified, return empty
+  if (!tableIdentifier || !organizationId || !supabase) {
+    return { menus: [], reservation: null };
   }
 
-  // If table identifier provided, first find the table strictly by hash and organization
-  if (!supabase) {
-    console.error('Supabase client not initialized');
-    return [];
-  }
+  // Find table
   const { data: tableData, error: tableError } = await supabase
     .from('tables')
     .select('id')
@@ -25,27 +22,58 @@ async function getMenus(tableIdentifier, organizationId) {
 
   if (tableError || !tableData) {
     console.error('Table not found or inactive for this organization:', tableError);
-    return []; // Strict filtering: if table provided but not found, show nothing
+    return { menus: [], reservation: null };
   }
 
-  // Then fetch menus assigned to this table
+  // Fetch menus assigned to this table
   const { data: assignments, error: assignmentsError } = await supabase
     .from('table_menu_assignments')
-    .select(`
-      menus (*)
-    `)
+    .select(`menus (*)`)
     .eq('table_id', tableData.id);
 
-  if (assignmentsError) {
-    console.error('Error fetching assigned menus:', assignmentsError);
-    return [];
-  }
-
-  // Extract menus from join result and filter active ones
-  return assignments
+  const menus = (assignments || [])
     .map(a => a.menus)
     .filter(m => m && m.is_active && m.organization_id === organizationId)
     .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+
+  // Get current local date/time in YYYY-MM-DD and HH:mm:ss format
+  // en-CA or sv often gives YYYY-MM-DD. en-GB gives 24h HH:mm:ss
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-CA'); 
+  const timeStr = now.toLocaleTimeString('en-GB');
+
+  console.log(`[Table Flow] Checking table ${tableIdentifier} at ${dateStr} ${timeStr}`);
+
+  const { data: reservations, error: resFetchError } = await supabase
+    .from('reservations')
+    .select('*')
+    .eq('table_id', tableData.id)
+    .eq('organization_id', organizationId)
+    .eq('reservation_date', dateStr)
+    .not('status', 'eq', 'cancelled');
+
+  if (resFetchError) {
+    console.error('[Table Flow] Error fetching reservations:', resFetchError);
+  }
+
+  let activeReservation = null;
+  if (reservations && reservations.length > 0) {
+    activeReservation = reservations.find(r => {
+      if (r.start_time && r.end_time) {
+        // Simple string comparison works for HH:mm:ss
+        return timeStr >= r.start_time && timeStr <= r.end_time;
+      }
+      return false;
+    });
+
+    if (activeReservation) {
+      console.log(`[Table Flow] SUCCESS: Active Reservation found for ${activeReservation.customer_name}`);
+    } else {
+      console.log(`[Table Flow] Found ${reservations.length} reservations today, but none active at ${timeStr}`);
+    }
+  }
+
+  return { menus, reservation: activeReservation || null };
 }
 
 export default async function Home({ params }) {
@@ -59,11 +87,19 @@ export default async function Home({ params }) {
       return <RootRedirect />;
   }
 
-  const menus = await getMenus(tableParam, organization?.id);
+  const { menus, reservation } = await getTableData(tableParam, organization?.id);
 
   return (
     <div className={styles.container}>
-      <MenuLanding initialMenus={menus} />
+      {reservation && reservation.popup_enabled && (
+          <TablePopup reservation={reservation} />
+      )}
+      <MenuLanding 
+        initialMenus={menus} 
+        title={reservation?.page_title_text || undefined}
+        subtitle={reservation?.page_subtitle_text || undefined}
+        footer={reservation?.page_footer_text || undefined}
+      />
     </div>
   );
 }

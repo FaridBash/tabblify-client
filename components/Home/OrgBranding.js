@@ -35,12 +35,12 @@ const OrgBranding = ({ uiConfig, title, subtitle, mode = 'menu' }) => {
                 <img src={uiConfig.logo_url} alt="Logo" className={styles.logo} />
             )}
             <div className={styles.branding}>
-                {uiConfig.main_show_title !== false && displayTitle && (
+                {(uiConfig.main_show_title !== false || !!title) && displayTitle && (
                     <h1 className={styles.homeTitle}>
                         {displayTitle}
                     </h1>
                 )}
-                {uiConfig.main_show_subtitle !== false && displaySubtitle && (
+                {(uiConfig.main_show_subtitle !== false || !!subtitle) && displaySubtitle && (
                     <p className={styles.subtitle}>
                         {displaySubtitle}
                     </p>

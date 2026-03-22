@@ -8,9 +8,16 @@ import { motion } from 'framer-motion';
 import styles from './MenuLanding.module.css';
 import OrgBranding from './OrgBranding';
 
-const MenuLanding = ({ initialMenus, title, subtitle }) => {
+const MenuLanding = ({ initialMenus, title, subtitle, footer }) => {
     const { t } = useLanguage();
-    const { uiConfig, tableData } = useUI();
+    const { uiConfig, tableData, setFooterText } = useUI();
+
+    React.useEffect(() => {
+        if (footer) {
+            setFooterText(footer);
+        }
+        return () => setFooterText('');
+    }, [footer, setFooterText]);
 
     const container = {
         hidden: { opacity: 0 },
