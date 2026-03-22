@@ -45,12 +45,15 @@
     .homeTitle {
         font-size: 2.5rem;
     }
+
     .subtitle {
         font-size: 1.2rem;
     }
+
     .logo {
         height: 80px;
     }
+
     .logoContainer {
         padding: 10px 20px 10px;
     }

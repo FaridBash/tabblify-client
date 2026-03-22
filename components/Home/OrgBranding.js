@@ -12,15 +12,15 @@ const OrgBranding = ({ uiConfig, title, subtitle, mode = 'menu' }) => {
 
     const isHomeMode = mode === 'home';
 
-    const displayTitle = title 
+    const displayTitle = title
         ? (typeof title === 'string' ? title : t(title.en, title.ar))
-        : (isHomeMode 
+        : (isHomeMode
             ? (t(uiConfig.main_title_en, uiConfig.main_title_ar) || t(uiConfig.title_en, uiConfig.title_ar) || 'Welcome')
             : (t(uiConfig.title_en, uiConfig.title_ar) || t('View Our Menus', 'عرض قوائمنا')));
 
-    const displaySubtitle = subtitle 
+    const displaySubtitle = subtitle
         ? (typeof subtitle === 'string' ? subtitle : t(subtitle.en, subtitle.ar))
-        : (isHomeMode 
+        : (isHomeMode
             ? (t(uiConfig.main_subtitle_en, uiConfig.main_subtitle_ar) || t(uiConfig.subtitle_en, uiConfig.subtitle_ar) || '')
             : (t(uiConfig.subtitle_en, uiConfig.subtitle_ar) || ''));
 

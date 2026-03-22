@@ -45,8 +45,8 @@ const PublicMenuList = ({ initialMenus }) => {
             >
                 {initialMenus.map((menu) => (
                     <motion.div key={menu.id} variants={item} className={styles.itemWrapper}>
-                        <Link 
-                            href={`/menus/${menu.id}${menu.menu_type?.toLowerCase() === 'pdf' ? '?type=pdf' : ''}`} 
+                        <Link
+                            href={`/menus/${menu.id}${menu.menu_type?.toLowerCase() === 'pdf' ? '?type=pdf' : ''}`}
                             className={`${styles.menuPill} glass-card glass-card-hover`}
                         >
                             <span className={styles.menuTitle}>

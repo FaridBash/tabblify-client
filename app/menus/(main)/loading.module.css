@@ -1,0 +1,98 @@
+.container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* OrgBranding matching styles */
+.logoContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    padding: 60px 20px 30px;
+    width: 100%;
+}
+
+.skeletonLogo {
+    height: 100px;
+    width: 100px;
+    border-radius: 50% !important; /* Force a rounded logo skeleton */
+    margin-bottom: 20px;
+}
+
+.branding {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.skeletonTitle {
+    height: 3.5rem;
+    width: 250px;
+    border-radius: 8px !important;
+    margin: 0;
+    padding: 10px 20px;
+}
+
+.skeletonSubtitle {
+    height: 1.4rem;
+    width: 150px;
+    border-radius: 4px !important;
+    margin-top: 5px;
+}
+
+/* MenuList matching styles */
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 90%;
+    max-width: 450px;
+    margin: 0 auto;
+    padding-bottom: 60px;
+}
+
+.itemWrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.skeletonPill {
+    height: 68px;
+    width: 100%;
+    max-width: 380px;
+    border-radius: 50px !important;
+    border: 1px solid var(--glass-border);
+}
+
+@media (max-width: 480px) {
+    .skeletonTitle {
+        height: 2.5rem;
+        width: 200px;
+    }
+
+    .skeletonSubtitle {
+        height: 1.2rem;
+        width: 120px;
+    }
+
+    .skeletonLogo {
+        height: 80px;
+        width: 80px;
+    }
+
+    .logoContainer {
+        padding: 10px 20px 10px;
+    }
+
+    .skeletonPill {
+        height: 60px;
+        max-width: 90%;
+    }
+}

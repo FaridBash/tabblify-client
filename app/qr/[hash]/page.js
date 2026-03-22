@@ -5,7 +5,6 @@ import { useRouter, useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { Loader2 } from 'lucide-react';
 import { useUI } from '@/context/UIContext';
-import MenuListSkeleton from '@/components/Loading/MenuListSkeleton';
 
 export default function QRRedirectPage() {
     const router = useRouter();
@@ -118,9 +117,5 @@ export default function QRRedirectPage() {
         );
     }
 
-    return (
-        <div style={{ minHeight: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <MenuListSkeleton />
-        </div>
-    );
+    return null;
 }

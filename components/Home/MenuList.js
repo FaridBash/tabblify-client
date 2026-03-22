@@ -32,8 +32,8 @@ const MenuList = ({ initialMenus }) => {
 
     const getMenuHref = (menu) => {
         const typeParam = menu.menu_type?.toLowerCase() === 'pdf' ? '?type=pdf' : '';
-        return tableData?.table_hash 
-            ? `/t/${tableData.table_hash}/menu/${menu.id}${typeParam}` 
+        return tableData?.table_hash
+            ? `/t/${tableData.table_hash}/menu/${menu.id}${typeParam}`
             : `/menus/${menu.id}${typeParam}`;
     };
 

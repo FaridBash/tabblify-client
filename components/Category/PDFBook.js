@@ -84,12 +84,7 @@ const PDFBook = ({ pdfUrl }) => {
                     <Document
                         file={pdfUrl}
                         onLoadSuccess={onDocumentLoadSuccess}
-                        loading={
-                            <div className={styles.loading}>
-                                <Loader2 className={styles.spinner} size={40} />
-                                <p>{t('Preparing Menu...', 'جاري تحضير القائمة...')}</p>
-                            </div>
-                        }
+                        loading={null}
                     >
                         {numPages && (
                             <HTMLPageFlip
@@ -122,7 +117,7 @@ const PDFBook = ({ pdfUrl }) => {
                                             renderAnnotationLayer={false}
                                             renderTextLayer={false}
                                             className={styles.pdfPage}
-                                            loading={<div style={{ backgroundColor: 'var(--secondary)', width: dimensions.width, height: dimensions.height }} />}
+                                            loading={null}
                                         />
                                     </PageContainer>
                                 ))}

@@ -235,7 +235,7 @@ export default function MyReservationsPage() {
                             </button>
                         )}
                         <button type="submit" className={styles.searchBtn} disabled={!emailInput.trim() || loading}>
-                            {loading ? <div className={styles.smallSpinner} /> : <ArrowRight size={20} />}
+                            <ArrowRight size={20} />
                         </button>
                     </div>
                     {noResultsFound && (
@@ -245,14 +245,7 @@ export default function MyReservationsPage() {
                     )}
                 </form>
 
-                {loading ? (
-                    <div className={styles.loadingState}>
-                        <div className={styles.spinner} />
-                        <p className={styles.loadingText}>
-                            {t('Loading reservations...', 'جاري تحميل الحجوزات...')}
-                        </p>
-                    </div>
-                ) : errorMsg ? (
+                {loading ? null : errorMsg ? (
                     <div className={styles.errorState}>
                         <AlertCircle size={48} color="#ef4444" opacity={0.5} />
                         <p>{errorMsg}</p>

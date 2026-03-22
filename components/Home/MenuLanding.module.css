@@ -27,7 +27,7 @@
     height: 68px;
     padding: 0 40px;
     width: 100%;
-    max-width: 320px;
+    max-width: 380px;
     border-radius: 50px;
     text-decoration: none;
     background: var(--secondary-light);
@@ -64,6 +64,6 @@
 
     .menuPill {
         height: 60px;
-        max-width: 280px;
+        max-width: 90%;
     }
 }

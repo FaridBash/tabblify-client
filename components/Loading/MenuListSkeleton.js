@@ -10,7 +10,7 @@ const MenuListSkeleton = () => {
             <div className={styles.list}>
                 {[1, 2, 3, 4].map((i) => (
                     <div key={i} className={styles.itemWrapper}>
-                        <motion.div 
+                        <motion.div
                             className={`${styles.skeletonPill} glass-card`}
                             initial={{ opacity: 0.5 }}
                             animate={{ opacity: [0.4, 0.7, 0.4] }}

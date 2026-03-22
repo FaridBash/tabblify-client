@@ -17,7 +17,7 @@ const Header = ({ config }) => {
 
     const pathname = rawPathname;
 
-    const isHome = pathname === '/' || pathname === '/menus' || /^\/t\/[^\/]+$/.test(pathname);
+    const isHome = pathname === '/' || /^\/t\/[^\/]+$/.test(pathname);
     const isGenericLanding = isHome && !organization;
 
     if (pathname.startsWith('/reserve')) return null;

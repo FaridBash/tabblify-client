@@ -10,7 +10,7 @@ import dynamic from 'next/dynamic';
 // Dynamically import the KonvaMap component to avoid SSR issues
 const KonvaMap = dynamic(() => import('./KonvaMap'), {
     ssr: false,
-    loading: () => <div className={styles.loading}>Initializing Floor Map...</div>
+    loading: () => null
 });
 
 export default function RestaurantMap({ layouts, selectedDate, selectedTime, settings, selectedTable, onTableSelect, editingResId }) {
@@ -339,9 +339,7 @@ export default function RestaurantMap({ layouts, selectedDate, selectedTime, set
                 className={styles.mapContainer}
                 ref={containerRef}
             >
-                {loading ? (
-                    <div className={styles.loading}>{t('Loading availability...', 'جاري التحقق من التوفر...')}</div>
-                ) : items.length === 0 ? (
+                {loading ? null : items.length === 0 ? (
                     <div className={styles.loading}>{t('No map layout found', 'لا يوجد تصميم للخريطة')}</div>
                 ) : dimensions.width > 0 && (
                     <KonvaMap
