@@ -6,6 +6,7 @@ import { getOrganization } from '@/lib/org';
 import { Providers } from '@/components/Providers';
 import { LanguageProvider } from '@/context/LanguageContext';
 import NotFoundUI from './not-found';
+import ClarityTracker from '@/components/Analytics/ClarityTracker';
 
 export const metadata = {
   title: 'Tabblify',
@@ -172,6 +173,7 @@ export default async function RootLayout({ children }) {
                   {children}
                 </main>
                 <Footer config={uiConfig} />
+                <ClarityTracker />
             </div>
             
             {/* Debug Footer - Only visible in development */}
