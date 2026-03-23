@@ -1,14 +1,13 @@
 import { supabase } from '@/lib/supabase';
-import MenuLanding from '@/components/Home/MenuLanding';
-import TablePopup from '@/components/Home/TablePopup';
+import TableReservationManager from '@/components/Home/TableReservationManager';
 import styles from './page.module.css';
 import { getOrganization } from '@/lib/org';
 import RootRedirect from '@/components/Home/RootRedirect';
 
-async function getTableData(tableIdentifier, organizationId) {
+async function getTableContent(tableIdentifier, organizationId) {
   // Strict: If no table hash provided or organization not identified, return empty
   if (!tableIdentifier || !organizationId || !supabase) {
-    return { menus: [], reservation: null };
+    return { menus: [], reservations: [] };
   }
 
   // Find table
@@ -22,11 +21,11 @@ async function getTableData(tableIdentifier, organizationId) {
 
   if (tableError || !tableData) {
     console.error('Table not found or inactive for this organization:', tableError);
-    return { menus: [], reservation: null };
+    return { menus: [], reservations: [] };
   }
 
   // Fetch menus assigned to this table
-  const { data: assignments, error: assignmentsError } = await supabase
+  const { data: assignments } = await supabase
     .from('table_menu_assignments')
     .select(`menus (*)`)
     .eq('table_id', tableData.id);
@@ -36,44 +35,27 @@ async function getTableData(tableIdentifier, organizationId) {
     .filter(m => m && m.is_active && m.organization_id === organizationId)
     .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
 
-  // Get current local date/time in YYYY-MM-DD and HH:mm:ss format
-  // en-CA or sv often gives YYYY-MM-DD. en-GB gives 24h HH:mm:ss
+  // Get date range (Today +/- 1 day) to handle server/local timezone mismatch for server fetch
   const now = new Date();
-  const dateStr = now.toLocaleDateString('en-CA'); 
-  const timeStr = now.toLocaleTimeString('en-GB');
+  const today = new Date(now.getTime());
+  const yesterday = new Date(now.getTime() - 86400000);
+  const tomorrow = new Date(now.getTime() + 86400000);
 
-  console.log(`[Table Flow] Checking table ${tableIdentifier} at ${dateStr} ${timeStr}`);
+  const dateList = [
+      yesterday.toLocaleDateString('en-CA'),
+      today.toLocaleDateString('en-CA'),
+      tomorrow.toLocaleDateString('en-CA')
+  ];
 
-  const { data: reservations, error: resFetchError } = await supabase
+  const { data: reservations } = await supabase
     .from('reservations')
     .select('*')
     .eq('table_id', tableData.id)
     .eq('organization_id', organizationId)
-    .eq('reservation_date', dateStr)
+    .in('reservation_date', dateList)
     .not('status', 'eq', 'cancelled');
 
-  if (resFetchError) {
-    console.error('[Table Flow] Error fetching reservations:', resFetchError);
-  }
-
-  let activeReservation = null;
-  if (reservations && reservations.length > 0) {
-    activeReservation = reservations.find(r => {
-      if (r.start_time && r.end_time) {
-        // Simple string comparison works for HH:mm:ss
-        return timeStr >= r.start_time && timeStr <= r.end_time;
-      }
-      return false;
-    });
-
-    if (activeReservation) {
-      console.log(`[Table Flow] SUCCESS: Active Reservation found for ${activeReservation.customer_name}`);
-    } else {
-      console.log(`[Table Flow] Found ${reservations.length} reservations today, but none active at ${timeStr}`);
-    }
-  }
-
-  return { menus, reservation: activeReservation || null };
+  return { menus, reservations: reservations || [] };
 }
 
 export default async function Home({ params }) {
@@ -87,18 +69,13 @@ export default async function Home({ params }) {
       return <RootRedirect />;
   }
 
-  const { menus, reservation } = await getTableData(tableParam, organization?.id);
+  const { menus, reservations } = await getTableContent(tableParam, organization?.id);
 
   return (
     <div className={styles.container}>
-      {reservation && reservation.popup_enabled && (
-          <TablePopup reservation={reservation} />
-      )}
-      <MenuLanding 
-        initialMenus={menus} 
-        title={reservation?.page_title_text || undefined}
-        subtitle={reservation?.page_subtitle_text || undefined}
-        footer={reservation?.page_footer_text || undefined}
+      <TableReservationManager 
+          initialMenus={menus} 
+          reservations={reservations} 
       />
     </div>
   );
