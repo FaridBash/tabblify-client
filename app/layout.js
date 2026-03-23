@@ -115,6 +115,12 @@ export default async function RootLayout({ children }) {
                       overflow: hidden !important;
                       overflow-x: hidden !important;
                     }
+                    .app-background {
+                      position: fixed;
+                      inset: 0;
+                      z-index: -1;
+                      transform: translateZ(0);
+                    }
                     .main-content {
                       min-height: 0 !important;
                        overflow-y: auto;
@@ -138,14 +144,10 @@ export default async function RootLayout({ children }) {
                     __html: `
                     ${uiConfig.background_image_mobile_url ? `
                     .app-background {
-                      position: fixed;
-                      inset: 0;
                       background-image: url("${uiConfig.background_image_mobile_url}");
                       background-size: cover;
                       background-position: center;
                       background-repeat: no-repeat;
-                      z-index: -1;
-                      transform: translateZ(0);
                     }
                     ` : ''}
                     ${uiConfig.background_image_desktop_url ? `
@@ -155,6 +157,7 @@ export default async function RootLayout({ children }) {
                       }
                     }
                     ` : ''}
+                    ${(uiConfig.background_image_mobile_url || uiConfig.background_image_desktop_url) ? `
                     .app-background::after {
                       content: '';
                       position: absolute;
@@ -164,6 +167,7 @@ export default async function RootLayout({ children }) {
                       height: 100%;
                       background: rgba(0, 0, 0, 0.4);
                     }
+                    ` : ''}
                   ` }} />
                 )}
 
