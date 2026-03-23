@@ -3,11 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "dev": "next dev",
+    "start": "next start",
+    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "upload": "opennextjs-cloudflare build && opennextjs-cloudflare upload",
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
   },
   "dependencies": {
+    "@opennextjs/cloudflare": "^1.17.3",
     "@supabase/supabase-js": "^2.97.0",
     "clsx": "^2.1.1",
     "framer-motion": "^12.34.3",
@@ -21,5 +26,8 @@
     "react-pdf": "^10.4.1",
     "react-zoom-pan-pinch": "^3.7.0",
     "tailwind-merge": "^3.5.0"
+  },
+  "devDependencies": {
+    "wrangler": "^4.76.0"
   }
 }
